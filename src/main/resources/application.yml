@@ -1,0 +1,5 @@
+spring:
+  profiles:
+    active: dev
+logging.level:
+  org.hibernate.SQL: debug
