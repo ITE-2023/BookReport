@@ -1,29 +1,21 @@
 package com.project.bookreport.domain;
 
+import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
-@Builder
-public class Member {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder
+@NoArgsConstructor
+public class Member extends BaseEntity {
 
     @Column(length = 20)
     private String username;
 
-    private  String password;
-
-    private LocalDateTime createDate;
-
-    private LocalDateTime updateDate;
+    private String password;
 }
-

@@ -1,6 +1,8 @@
 package com.project.bookreport.service;
 
 import com.project.bookreport.domain.Member;
+import com.project.bookreport.exception.ErrorCode;
+import com.project.bookreport.exception.MemberException;
 import com.project.bookreport.model.member.JoinRequest;
 import com.project.bookreport.model.member.MemberDTO;
 import com.project.bookreport.repository.MemberRepository;
@@ -14,7 +16,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     public MemberDTO join(JoinRequest joinRequest) {
         if (!joinRequest.getPassword().equals(joinRequest.getPassword2())) {
-            throw new RuntimeException();
+            throw new MemberException(ErrorCode.AUTHENTICATION_FAILED);
         }
         Member member = Member.builder()
                 .username(joinRequest.getUsername())
