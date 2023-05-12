@@ -1,6 +1,8 @@
 package com.project.bookreport.security;
 
 import com.project.bookreport.security.jwt.JWTAuthorizationFilter;
+import com.project.bookreport.security.jwt.JwtProvider;
+import com.project.bookreport.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
+
+  private final JwtProvider jwtProvider;
+  private final MemberService memberService;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -31,7 +36,8 @@ public class SecurityConfig {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 스프링 시큐리티가 생성하지도 않고 존재해도 사용하지 않음
         .and()
         .addFilterBefore(
-            new JWTAuthorizationFilter(authenticationConfiguration.getAuthenticationManager()),
+            new JWTAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(),
+                jwtProvider, memberService),
             UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

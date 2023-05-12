@@ -10,6 +10,7 @@ import com.project.bookreport.model.member.LoginRequest;
 import com.project.bookreport.model.member.MemberDTO;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.security.jwt.JwtProvider;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,5 +55,12 @@ public class MemberService {
         member.setAccessToken(accessToken);
         member.setRefreshToken(refreshToken);
         return JwtDto.from(member);
+    }
+    public Optional<Member> findMemberById(Long id) {
+        return memberRepository.findMemberById(id);
+    }
+
+    public boolean verifyWithMemberToken(Member member, String token) {
+        return member.getAccessToken().equals(token);
     }
 }
