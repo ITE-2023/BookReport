@@ -30,4 +30,10 @@ public class Member extends BaseEntity {
         joinColumns = @JoinColumn(name = "member_id"))
     @Enumerated(EnumType.STRING)
     private Set<MemberRole> roleSet;
+
+    @Column(columnDefinition = "TEXT")
+    private String accessToken;
+
+    @Column(columnDefinition = "TEXT")
+    private String refreshToken;
 }
