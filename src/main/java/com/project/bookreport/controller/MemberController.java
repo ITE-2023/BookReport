@@ -1,6 +1,8 @@
 package com.project.bookreport.controller;
 
+import com.project.bookreport.model.jwt.JwtDto;
 import com.project.bookreport.model.member.JoinRequest;
+import com.project.bookreport.model.member.LoginRequest;
 import com.project.bookreport.model.member.MemberDTO;
 import com.project.bookreport.service.MemberService;
 import jakarta.validation.Valid;
@@ -23,4 +25,13 @@ public class MemberController {
         return ResponseEntity.ok(memberDTO) ;
     }
 
+    @PostMapping("/member/login")
+    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginRequest loginRequest) {
+        JwtDto jwtDto = memberService.login(loginRequest);
+
+        return ResponseEntity.ok()
+            .header("AccessToken", jwtDto.getAccessToken())
+            .header("RefreshToken", jwtDto.getRefreshToken())
+            .build();
+    }
 }
