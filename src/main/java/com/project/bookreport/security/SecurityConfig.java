@@ -1,5 +1,7 @@
 package com.project.bookreport.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bookreport.exception.CustomAuthenticationEntryPoint;
 import com.project.bookreport.security.jwt.JWTAuthorizationFilter;
 import com.project.bookreport.security.jwt.JwtProvider;
 import com.project.bookreport.service.MemberService;
@@ -21,6 +23,7 @@ public class SecurityConfig {
 
   private final JwtProvider jwtProvider;
   private final MemberService memberService;
+  private final ObjectMapper objectMapper;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -42,7 +45,9 @@ public class SecurityConfig {
         .addFilterBefore(
             new JWTAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(),
                 jwtProvider, memberService),
-            UsernamePasswordAuthenticationFilter.class);
+            UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling()
+        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper));
 
     return http.build();
   }
