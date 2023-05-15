@@ -14,6 +14,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class MemberService {
 
     }
 
+    @Transactional
     public JwtDto login(LoginRequest loginRequest) {
         Member member = memberRepository.findMemberByUsername(loginRequest.getUsername())
             .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
@@ -62,5 +64,20 @@ public class MemberService {
 
     public boolean verifyWithMemberToken(Member member, String token) {
         return member.getAccessToken().equals(token);
+    }
+
+    @Transactional
+    public JwtDto reissue(String refreshToken) {
+        String token = jwtProvider.resolveToken(refreshToken);
+        Member member = memberRepository.findByRefreshToken(token)
+            .orElseThrow(() -> new MemberException(INVALID_TOKEN));
+
+        if (!jwtProvider.verifyRefreshToken(token)) {
+            throw new MemberException(INVALID_TOKEN);
+        }
+
+        String accessToken = jwtProvider.generateAccessToken(member);
+        member.setAccessToken(accessToken);
+        return JwtDto.from(member);
     }
 }

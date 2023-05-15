@@ -89,4 +89,17 @@ public class JwtProvider {
     }
     return null;
   }
+
+  public boolean verifyRefreshToken(String refreshToken) {
+    try {
+      Jws<Claims> claimsJws = Jwts.parserBuilder()
+          .setSigningKey(getSecretKey2())
+          .build()
+          .parseClaimsJws(refreshToken);
+
+      return !claimsJws.getBody().getExpiration().before(new Date());
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }
