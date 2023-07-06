@@ -15,6 +15,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity // 스프링 시큐리티 사용을 위한 어노테이션
 @RequiredArgsConstructor
@@ -33,7 +36,8 @@ public class SecurityConfig {
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
             .requestMatchers("/member/join", "/member/login", "/member/reissue").permitAll()
             .anyRequest().authenticated())
-        .cors().disable()       // 타 도메인에서 API 접근 허용
+        .cors().configurationSource(corsConfigurationSource()) // 타 도메인에서 API 접근 허용
+        .and()
         .csrf().disable()       // CSRF 토큰 기능 사용 X
         .httpBasic().disable()   // Http basic Auth 기반 로그인 기능 사용 X
         .headers().frameOptions().sameOrigin()
@@ -50,5 +54,16 @@ public class SecurityConfig {
         .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper));
 
     return http.build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
+    configuration.addAllowedOrigin("http://localhost:3000");
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }
