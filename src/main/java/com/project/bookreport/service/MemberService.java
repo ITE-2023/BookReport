@@ -3,6 +3,7 @@ package com.project.bookreport.service;
 import static com.project.bookreport.exception.ErrorCode.*;
 
 import com.project.bookreport.domain.Member;
+import com.project.bookreport.domain.status.MemberRole;
 import com.project.bookreport.exception.MemberException;
 import com.project.bookreport.model.jwt.JwtDto;
 import com.project.bookreport.model.member.JoinRequest;
@@ -10,7 +11,9 @@ import com.project.bookreport.model.member.LoginRequest;
 import com.project.bookreport.model.member.MemberDTO;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.security.jwt.JwtProvider;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,9 @@ public class MemberService {
                 .username(joinRequest.getUsername())
                 .password(passwordEncoder.encode(joinRequest.getPassword()))
                 .build();
+        Set<MemberRole> roles = new HashSet<>();
+        roles.add(MemberRole.ROLE_MEMBER);
+        member.setRoleSet(roles);
         Member savedMember = memberRepository.save(member);
         return MemberDTO.builder()
                 .id(savedMember.getId())
