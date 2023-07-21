@@ -44,7 +44,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
-    log.info("JWTAuthorizationFilter 실행");
 
     String bearerToken = request.getHeader("Authorization");
     String token = jwtProvider.resolveToken(bearerToken);
