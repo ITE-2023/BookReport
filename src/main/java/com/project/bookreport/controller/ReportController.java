@@ -4,6 +4,7 @@ import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.DataNotFoundException;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportCreateRequest;
+import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
@@ -23,10 +24,10 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping("/report/create")
-    public ResponseEntity<Report> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
+    public ResponseEntity<ReportDTO> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
                                          ,@AuthenticationPrincipal MemberContext memberContext){
-        Report report = reportService.create(reportCreateRequest, memberContext);
-        return ResponseEntity.ok(report);
+        ReportDTO reportDTO = reportService.create(reportCreateRequest, memberContext);
+        return ResponseEntity.ok(reportDTO);
     }
     @PreAuthorize("isAuthenticated")
     @DeleteMapping("/report/delete/{id}")
