@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Member extends BaseEntity {
 
-    @Column(length = 20)
+    @Column(length = 20, unique = true)
     private String username;
 
     private String password;
