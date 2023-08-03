@@ -32,13 +32,15 @@ public class ReportService {
             throw new DataNotFoundException("report not found");
         }
     }
-    public Report create(ReportCreateRequest reportCreateRequest, MemberContext memberContext) {
+    public Report create(ReportCreateRequest reportCreateRequest, MemberContext memberContext)
+    {
         Member member = memberRepository.findMemberById(memberContext.getId()).orElseThrow(()-> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
         Report report = Report.builder()
                 .title(reportCreateRequest.getTitle())
                 .content(reportCreateRequest.getContent())
                 .member(member)
                 .build();
+
         return reportRepository.save(report);
     }
 

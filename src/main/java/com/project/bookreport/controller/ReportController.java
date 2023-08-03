@@ -2,9 +2,11 @@ package com.project.bookreport.controller;
 
 import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.DataNotFoundException;
+import com.project.bookreport.model.book.BookCreateRequest;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportCreateRequest;
 import com.project.bookreport.model.report.ReportUpdateRequest;
+import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +23,14 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
+    private final BookService bookService;
 
     @PostMapping("/report/create")
     public ResponseEntity<Report> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
-                                         ,@AuthenticationPrincipal MemberContext memberContext){
+                                         , @AuthenticationPrincipal MemberContext memberContext
+                                         , @Valid @RequestBody BookCreateRequest bookCreateRequest){
         Report report = reportService.create(reportCreateRequest, memberContext);
+        bookService.create(bookCreateRequest,report);
         return ResponseEntity.ok(report);
     }
     @PreAuthorize("isAuthenticated")

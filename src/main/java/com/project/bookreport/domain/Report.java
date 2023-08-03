@@ -23,5 +23,7 @@ public class Report extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)//한번에 값을 다 가져옴--> Member select문도 가져옴
     private Member member;
 
+    private Book book;
+
 
 }
