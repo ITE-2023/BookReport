@@ -6,7 +6,11 @@ import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -42,5 +46,13 @@ public class ReportController {
     public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
         ReportDTO reportDTO = reportService.getReport(id);
         return ResponseEntity.ok(reportDTO);
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<ReportDTO>> getReportList(
+        @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 10)
+        Pageable pageable) {
+        List<ReportDTO> reportList = reportService.getReportList(pageable);
+        return ResponseEntity.ok(reportList);
     }
 }

@@ -12,7 +12,10 @@ import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.ReportRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,5 +84,15 @@ public class ReportService {
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
             .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+    }
+
+    public List<ReportDTO> getReportList(Pageable pageable) {
+        Page<Report> reports = reportRepository.findAll(pageable);
+        return reports.stream().map(report -> ReportDTO.builder().id(report.getId())
+            .title(report.getTitle())
+            .content(report.getContent())
+            .createDate(report.getCreateDate())
+            .updateDate(report.getUpdateDate())
+            .build()).toList();
     }
 }
