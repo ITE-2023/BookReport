@@ -1,22 +1,23 @@
 package com.project.bookreport.controller;
 
-import com.project.bookreport.domain.Report;
-import com.project.bookreport.exception.DataNotFoundException;
+import static org.springframework.data.domain.Sort.Direction.*;
+
 import com.project.bookreport.model.book.BookCreateRequest;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportCreateRequest;
+import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -26,32 +27,47 @@ public class ReportController {
     private final BookService bookService;
 
     @PostMapping("/report/create")
-    public ResponseEntity<Report> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
-                                         , @AuthenticationPrincipal MemberContext memberContext
-                                         , @Valid @RequestBody BookCreateRequest bookCreateRequest){
-        Report report = reportService.create(reportCreateRequest, memberContext);
-        bookService.create(bookCreateRequest,report);
-        return ResponseEntity.ok(report);
+    public ResponseEntity<ReportDTO> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
+                                         ,@AuthenticationPrincipal MemberContext memberContext,
+                                            @Valid @RequestBody BookCreateRequest bookCreateRequest){
+        ReportDTO reportDTO = reportService.create(reportCreateRequest, memberContext);
+        bookService.create(bookCreateRequest);
+        return ResponseEntity.ok(reportDTO);
     }
-    @PreAuthorize("isAuthenticated")
+
     @DeleteMapping("/report/delete/{id}")
-    public ResponseEntity delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") long id) throws DataNotFoundException {
-        Report report = this.reportService.getReport(id);
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-        }
-        this.reportService.delete(report);
+    public ResponseEntity<Object> delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
+        reportService.delete(memberContext, id);
         return ResponseEntity.ok().build();//완료한 값을 던짐
     }
-    @PreAuthorize("isAuthenticated")
-    @PostMapping("/report/modify/{id}")
-    public ResponseEntity<Report> modify(@Valid @RequestBody ReportUpdateRequest reportUpdateRequest,
-                                         @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") long id) throws DataNotFoundException {
-        Report report = this.reportService.getReport(id);
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-        }
-        Report updateReport = this.reportService.modify(report, reportUpdateRequest ,memberContext);
-        return ResponseEntity.ok(updateReport);
+
+    @PostMapping("/report/update/{id}")
+    public ResponseEntity<ReportDTO> update(@Valid @RequestBody ReportUpdateRequest reportUpdateRequest,
+                                         @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id){
+        ReportDTO reportDTO = reportService.update(id, reportUpdateRequest, memberContext);
+        return ResponseEntity.ok(reportDTO);
+    }
+
+    @GetMapping("/report/{id}")
+    public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
+        ReportDTO reportDTO = reportService.getReport(id);
+        return ResponseEntity.ok(reportDTO);
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<ReportDTO>> getReportList(
+        @PageableDefault(sort = "id", direction = DESC, size = 10)
+        Pageable pageable) {
+        List<ReportDTO> reportList = reportService.getReportList(pageable);
+        return ResponseEntity.ok(reportList);
+    }
+
+    @GetMapping("/myReports")
+    public ResponseEntity<List<ReportDTO>> getMyReportList(
+        @AuthenticationPrincipal MemberContext memberContext,
+        @PageableDefault(sort = "id", direction = DESC, size = 10) Pageable pageable
+    ) {
+        List<ReportDTO> myReportList = reportService.getMyReportList(memberContext, pageable);
+        return ResponseEntity.ok(myReportList);
     }
 }

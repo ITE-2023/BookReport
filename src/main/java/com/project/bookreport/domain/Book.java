@@ -1,6 +1,5 @@
 package com.project.bookreport.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,8 +17,4 @@ public class Book extends BaseEntity {
     private String bookName;
     private String author;
     private String publisher;
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY)
-    private Report report;
-
 }

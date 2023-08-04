@@ -7,5 +7,6 @@ import lombok.Getter;
 public class ReportCreateRequest {
     @NotBlank(message = "제목을 작성해주세요.")
     private String title;
+    @NotBlank(message = "내용을 입력해주세요")
     private String content;
 }
