@@ -24,16 +24,12 @@ public class ReportController {
         ReportDTO reportDTO = reportService.create(reportCreateRequest, memberContext);
         return ResponseEntity.ok(reportDTO);
     }
-//    @PreAuthorize("isAuthenticated")
-//    @DeleteMapping("/report/delete/{id}")
-//    public ResponseEntity delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") long id) throws DataNotFoundException {
-//        Report report = this.reportService.getReport(id);
-//        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-//        }
-//        this.reportService.delete(report);
-//        return ResponseEntity.ok().build();//완료한 값을 던짐
-//    }
+
+    @DeleteMapping("/report/delete/{id}")
+    public ResponseEntity<Object> delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
+        reportService.delete(memberContext, id);
+        return ResponseEntity.ok().build();//완료한 값을 던짐
+    }
 
     @PostMapping("/report/update/{id}")
     public ResponseEntity<ReportDTO> update(@Valid @RequestBody ReportUpdateRequest reportUpdateRequest,

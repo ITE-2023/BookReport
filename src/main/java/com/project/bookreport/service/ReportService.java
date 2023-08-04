@@ -40,7 +40,14 @@ public class ReportService {
             .build();
     }
 
-    public void delete(Report report){this.reportRepository.delete(report);}
+    public void delete(MemberContext memberContext, Long id){
+        Report report = reportRepository.findById(id)
+            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
+            throw new ReportException(ACCESS_DENIED);
+        }
+        reportRepository.delete(report);
+    }
 
     @Transactional
     public ReportDTO update(Long id, ReportUpdateRequest reportUpdateRequest, MemberContext memberContext){
