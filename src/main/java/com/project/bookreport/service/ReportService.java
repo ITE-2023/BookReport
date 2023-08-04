@@ -41,8 +41,8 @@ public class ReportService {
     }
 
     public void delete(MemberContext memberContext, Long id){
-        Report report = reportRepository.findById(id)
-            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+        Report report = findReportById(id);
+
         if(!report.getMember().getUsername().equals(memberContext.getUsername())){
             throw new ReportException(ACCESS_DENIED);
         }
@@ -51,8 +51,7 @@ public class ReportService {
 
     @Transactional
     public ReportDTO update(Long id, ReportUpdateRequest reportUpdateRequest, MemberContext memberContext){
-        Report report = reportRepository.findById(id)
-            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+        Report report = findReportById(id);
 
         if(!report.getMember().getUsername().equals(memberContext.getUsername())){
             throw new ReportException(ACCESS_DENIED);
@@ -66,5 +65,21 @@ public class ReportService {
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
+    }
+
+    public ReportDTO getReport(Long id) {
+        Report report = findReportById(id);
+        return ReportDTO.builder()
+            .id(report.getId())
+            .title(report.getTitle())
+            .content(report.getContent())
+            .createDate(report.getCreateDate())
+            .updateDate(report.getUpdateDate())
+            .build();
+    }
+
+    private Report findReportById(Long id) {
+        return reportRepository.findById(id)
+            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
     }
 }

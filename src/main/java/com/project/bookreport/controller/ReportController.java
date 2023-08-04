@@ -37,4 +37,10 @@ public class ReportController {
         ReportDTO reportDTO = reportService.update(id, reportUpdateRequest, memberContext);
         return ResponseEntity.ok(reportDTO);
     }
+
+    @GetMapping("/report/{id}")
+    public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
+        ReportDTO reportDTO = reportService.getReport(id);
+        return ResponseEntity.ok(reportDTO);
+    }
 }
