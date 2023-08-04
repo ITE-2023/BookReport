@@ -95,4 +95,15 @@ public class ReportService {
             .updateDate(report.getUpdateDate())
             .build()).toList();
     }
+
+    public List<ReportDTO> getMyReportList(MemberContext memberContext, Pageable pageable) {
+        List<Report> myReport = reportRepository.findAllByMember_Username(
+            memberContext.getUsername(), pageable);
+        return myReport.stream().map(report -> ReportDTO.builder().id(report.getId())
+            .title(report.getTitle())
+            .content(report.getContent())
+            .createDate(report.getCreateDate())
+            .updateDate(report.getUpdateDate())
+            .build()).toList();
+    }
 }

@@ -1,5 +1,7 @@
 package com.project.bookreport.controller;
 
+import static org.springframework.data.domain.Sort.Direction.*;
+
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportCreateRequest;
 import com.project.bookreport.model.report.ReportDTO;
@@ -9,7 +11,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,9 +51,18 @@ public class ReportController {
 
     @GetMapping("/reports")
     public ResponseEntity<List<ReportDTO>> getReportList(
-        @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 10)
+        @PageableDefault(sort = "id", direction = DESC, size = 10)
         Pageable pageable) {
         List<ReportDTO> reportList = reportService.getReportList(pageable);
         return ResponseEntity.ok(reportList);
+    }
+
+    @GetMapping("/myReports")
+    public ResponseEntity<List<ReportDTO>> getMyReportList(
+        @AuthenticationPrincipal MemberContext memberContext,
+        @PageableDefault(sort = "id", direction = DESC, size = 10) Pageable pageable
+    ) {
+        List<ReportDTO> myReportList = reportService.getMyReportList(memberContext, pageable);
+        return ResponseEntity.ok(myReportList);
     }
 }
