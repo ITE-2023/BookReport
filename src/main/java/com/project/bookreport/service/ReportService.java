@@ -49,6 +49,7 @@ public class ReportService {
         if(!report.getMember().getUsername().equals(memberContext.getUsername())){
             throw new ReportException(ACCESS_DENIED);
         }
+
         reportRepository.delete(report);
     }
 
