@@ -2,10 +2,12 @@ package com.project.bookreport.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
+import com.project.bookreport.model.book.BookCreateRequest;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportCreateRequest;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
+import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,11 +24,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
+    private final BookService bookService;
 
     @PostMapping("/report/create")
     public ResponseEntity<ReportDTO> create(@Valid @RequestBody ReportCreateRequest reportCreateRequest
-                                         ,@AuthenticationPrincipal MemberContext memberContext){
+                                         ,@AuthenticationPrincipal MemberContext memberContext,
+                                            @Valid @RequestBody BookCreateRequest bookCreateRequest){
         ReportDTO reportDTO = reportService.create(reportCreateRequest, memberContext);
+        bookService.create(bookCreateRequest);
         return ResponseEntity.ok(reportDTO);
     }
 
