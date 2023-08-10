@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ReportCreateResponse {
+public class ReportResponse {
 
   private ReportDTO reportDTO;
   private BookDTO bookDTO;

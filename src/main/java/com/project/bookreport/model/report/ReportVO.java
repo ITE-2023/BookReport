@@ -4,7 +4,7 @@ import com.project.bookreport.model.book.BookCreateRequest;
 import lombok.Getter;
 
 @Getter
-public class ReportCreateVO {
+public class ReportVO {
   private ReportCreateRequest reportCreateRequest;
   private BookCreateRequest bookCreateRequest;
 }
