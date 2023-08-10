@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class BookCreateRequest {
+public class BookRequest {
     @NotBlank(message = "책 제목을 적어주세요.")
     private String bookName;
     @NotBlank(message = "작가의 이름을 적어주세요.")
