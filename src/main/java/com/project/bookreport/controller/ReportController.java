@@ -2,7 +2,9 @@ package com.project.bookreport.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
+import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
+import com.project.bookreport.model.report.ReportCreateResponse;
 import com.project.bookreport.model.report.ReportCreateVO;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportUpdateRequest;
@@ -26,11 +28,16 @@ public class ReportController {
     private final BookService bookService;
 
     @PostMapping("/report/create")
-    public ResponseEntity<ReportDTO> create(@AuthenticationPrincipal MemberContext memberContext,
+    public ResponseEntity<ReportCreateResponse> create(@AuthenticationPrincipal MemberContext memberContext,
         @Valid @RequestBody ReportCreateVO reportCreateVO){
         ReportDTO reportDTO = reportService.create(reportCreateVO.getReportCreateRequest(), memberContext);
-        bookService.create(reportCreateVO.getBookCreateRequest());
-        return ResponseEntity.ok(reportDTO);
+        BookDTO bookDTO = bookService.create(reportCreateVO.getBookCreateRequest());
+        return ResponseEntity.ok(
+            ReportCreateResponse
+                .builder()
+                .reportDTO(reportDTO)
+                .bookDTO(bookDTO)
+                .build());
     }
 
     @DeleteMapping("/report/delete/{id}")

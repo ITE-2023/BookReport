@@ -16,13 +16,21 @@ import org.springframework.stereotype.Service;
 public class BookService {
     private final BookRepository bookRepository;
 
-    public Book create(BookCreateRequest bookCreateRequest){
+    public BookDTO create(BookCreateRequest bookCreateRequest){
         Book book = Book.builder()
                 .bookName(bookCreateRequest.getBookName())
                 .author(bookCreateRequest.getAuthor())
                 .publisher(bookCreateRequest.getPublisher())
                 .build();
-        return bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
+        return BookDTO.builder()
+            .id(savedBook.getId())
+            .bookName(savedBook.getBookName())
+            .author(savedBook.getAuthor())
+            .publisher(savedBook.getPublisher())
+            .createDate(savedBook.getCreateDate())
+            .updateDate(savedBook.getUpdateDate())
+            .build();
     }
     /*public void delete(BookCreateRequest bookCreateRequest){
         Book book = Book.builder()
