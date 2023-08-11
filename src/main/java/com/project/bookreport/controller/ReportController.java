@@ -4,7 +4,6 @@ import static org.springframework.data.domain.Sort.Direction.*;
 
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
-import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.model.report.ReportResponse;
 import com.project.bookreport.model.report.ReportVO;
 import com.project.bookreport.model.report.ReportDTO;
@@ -40,17 +39,25 @@ public class ReportController {
                 .build());
     }
 
+    @PatchMapping("/report/update/{id}")
+    public ResponseEntity<ReportResponse> update(
+        @AuthenticationPrincipal MemberContext memberContext,
+        @PathVariable("id") Long id,
+        @Valid @RequestBody ReportVO reportVO){
+        BookDTO bookDTO = bookService.create(reportVO.getBookRequest());
+        ReportDTO reportDTO = reportService.update(memberContext, id, reportVO.getReportRequest(), bookDTO);
+        return ResponseEntity.ok(
+            ReportResponse
+                .builder()
+                .bookDTO(bookDTO)
+                .reportDTO(reportDTO)
+                .build());
+    }
+
     @DeleteMapping("/report/delete/{id}")
     public ResponseEntity<Object> delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
         reportService.delete(memberContext, id);
         return ResponseEntity.ok().build();//완료한 값을 던짐
-    }
-
-    @PostMapping("/report/update/{id}")
-    public ResponseEntity<ReportDTO> update(@Valid @RequestBody ReportRequest reportRequest,
-                                         @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id){
-        ReportDTO reportDTO = reportService.update(id, reportRequest, memberContext);
-        return ResponseEntity.ok(reportDTO);
     }
 
     @GetMapping("/report/{id}")

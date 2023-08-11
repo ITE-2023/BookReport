@@ -53,29 +53,26 @@ public class ReportService {
             .build();
     }
 
-    public void delete(MemberContext memberContext, Long id){
-        Report report = findReportById(id);
-
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-            throw new ReportException(ACCESS_DENIED);
-        }
-
-        reportRepository.delete(report);
-    }
-
     @Transactional
-    public ReportDTO update(Long id, ReportRequest reportRequest, MemberContext memberContext){
-        Report report = findReportById(id);
+    public ReportDTO update(MemberContext memberContext, Long id, ReportRequest reportRequest,
+        BookDTO bookDTO) {
 
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
+        Report report = findReportById(id);
+        if (!report.getMember().getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
+        Book book = bookRepository.findById(bookDTO.getId())
+            .orElseThrow(() ->new BookException(BOOK_NOT_FOUND));
+
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
+        report.setBook(book);
         return ReportDTO.builder()
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .memberId(report.getMember().getId())
+            .bookId(bookDTO.getId())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
@@ -90,6 +87,16 @@ public class ReportService {
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
+    }
+
+    public void delete(MemberContext memberContext, Long id){
+        Report report = findReportById(id);
+
+        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
+            throw new ReportException(ACCESS_DENIED);
+        }
+
+        reportRepository.delete(report);
     }
 
     private Report findReportById(Long id) {

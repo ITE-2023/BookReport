@@ -1,9 +1,6 @@
 package com.project.bookreport.service;
 
 import com.project.bookreport.domain.Book;
-import com.project.bookreport.domain.Report;
-import com.project.bookreport.exception.BookException;
-import com.project.bookreport.exception.ErrorCode;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.repository.BookRepository;
@@ -43,24 +40,6 @@ public class BookService {
         return bookRepository.findByBookNameAndAuthorAndPublisher(
             bookRequest.getBookName(),
             bookRequest.getAuthor(), bookRequest.getPublisher());
-    }
-
-    public BookDTO update(Report report, BookRequest bookRequest){
-        if(!report.getBook().getBookName().equals(bookRequest.getBookName())){
-            throw new BookException(ErrorCode.ACCESS_DENIED);
-        }
-        Book book = report.getBook();
-        book.setBookName(bookRequest.getBookName());
-        book.setAuthor(bookRequest.getAuthor());
-        book.setPublisher(bookRequest.getPublisher());
-        return BookDTO.builder()
-                .id(book.getId())
-                .bookName(book.getBookName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .createDate(book.getCreateDate())
-                .updateDate(book.getUpdateDate())
-                .build();
     }
 }
 
