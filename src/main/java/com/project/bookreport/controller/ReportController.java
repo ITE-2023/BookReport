@@ -30,13 +30,13 @@ public class ReportController {
     @PostMapping("/report/create")
     public ResponseEntity<ReportResponse> create(@AuthenticationPrincipal MemberContext memberContext,
         @Valid @RequestBody ReportVO reportVO){
-        ReportDTO reportDTO = reportService.create(reportVO.getReportRequest(), memberContext);
         BookDTO bookDTO = bookService.create(reportVO.getBookRequest());
+        ReportDTO reportDTO = reportService.create(memberContext, reportVO.getReportRequest(), bookDTO);
         return ResponseEntity.ok(
             ReportResponse
                 .builder()
-                .reportDTO(reportDTO)
                 .bookDTO(bookDTO)
+                .reportDTO(reportDTO)
                 .build());
     }
 
