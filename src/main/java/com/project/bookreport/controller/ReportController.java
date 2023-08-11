@@ -4,10 +4,10 @@ import static org.springframework.data.domain.Sort.Direction.*;
 
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
+import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.model.report.ReportResponse;
 import com.project.bookreport.model.report.ReportVO;
 import com.project.bookreport.model.report.ReportDTO;
-import com.project.bookreport.model.report.ReportUpdateRequest;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
@@ -30,8 +30,8 @@ public class ReportController {
     @PostMapping("/report/create")
     public ResponseEntity<ReportResponse> create(@AuthenticationPrincipal MemberContext memberContext,
         @Valid @RequestBody ReportVO reportVO){
-        ReportDTO reportDTO = reportService.create(reportVO.getReportCreateRequest(), memberContext);
-        BookDTO bookDTO = bookService.create(reportVO.getBookCreateRequest());
+        ReportDTO reportDTO = reportService.create(reportVO.getReportRequest(), memberContext);
+        BookDTO bookDTO = bookService.create(reportVO.getBookRequest());
         return ResponseEntity.ok(
             ReportResponse
                 .builder()
@@ -47,9 +47,9 @@ public class ReportController {
     }
 
     @PostMapping("/report/update/{id}")
-    public ResponseEntity<ReportDTO> update(@Valid @RequestBody ReportUpdateRequest reportUpdateRequest,
+    public ResponseEntity<ReportDTO> update(@Valid @RequestBody ReportRequest reportRequest,
                                          @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id){
-        ReportDTO reportDTO = reportService.update(id, reportUpdateRequest, memberContext);
+        ReportDTO reportDTO = reportService.update(id, reportRequest, memberContext);
         return ResponseEntity.ok(reportDTO);
     }
 

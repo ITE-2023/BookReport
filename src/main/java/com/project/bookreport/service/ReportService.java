@@ -7,9 +7,8 @@ import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.MemberException;
 import com.project.bookreport.exception.ReportException;
 import com.project.bookreport.model.member.MemberContext;
-import com.project.bookreport.model.report.ReportCreateRequest;
 import com.project.bookreport.model.report.ReportDTO;
-import com.project.bookreport.model.report.ReportUpdateRequest;
+import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
@@ -25,12 +24,12 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
 
-    public ReportDTO create(ReportCreateRequest reportCreateRequest, MemberContext memberContext) {
+    public ReportDTO create(ReportRequest reportRequest, MemberContext memberContext) {
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()-> new MemberException(MEMBER_NOT_FOUND));
         Report report = Report.builder()
-                .title(reportCreateRequest.getTitle())
-                .content(reportCreateRequest.getContent())
+                .title(reportRequest.getTitle())
+                .content(reportRequest.getContent())
                 .member(member)
                 .build();
         Report savedReport = reportRepository.save(report);
@@ -54,14 +53,14 @@ public class ReportService {
     }
 
     @Transactional
-    public ReportDTO update(Long id, ReportUpdateRequest reportUpdateRequest, MemberContext memberContext){
+    public ReportDTO update(Long id, ReportRequest reportRequest, MemberContext memberContext){
         Report report = findReportById(id);
 
         if(!report.getMember().getUsername().equals(memberContext.getUsername())){
             throw new ReportException(ACCESS_DENIED);
         }
-        report.setTitle(reportUpdateRequest.getTitle());
-        report.setContent(reportUpdateRequest.getContent());
+        report.setTitle(reportRequest.getTitle());
+        report.setContent(reportRequest.getContent());
         return ReportDTO.builder()
             .id(report.getId())
             .title(report.getTitle())
