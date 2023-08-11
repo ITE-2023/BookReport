@@ -1,6 +1,7 @@
 package com.project.bookreport.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * 인가 실패 시, 예외 핸들러
+ */
 @Component
 @RequiredArgsConstructor
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {

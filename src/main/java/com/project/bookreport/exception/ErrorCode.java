@@ -3,6 +3,9 @@ package com.project.bookreport.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 상태코드와 오류 메세지
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {

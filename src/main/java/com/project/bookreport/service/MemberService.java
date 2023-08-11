@@ -4,7 +4,7 @@ import static com.project.bookreport.exception.ErrorCode.*;
 
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.status.MemberRole;
-import com.project.bookreport.exception.MemberException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.jwt.JwtDto;
 import com.project.bookreport.model.member.JoinRequest;
 import com.project.bookreport.model.member.LoginRequest;
@@ -27,6 +27,11 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+    /**
+     * 회원 가입
+     * - 비밀번호와 비밀번호 재확인 체크
+     * - username으로 중복 회원 체크
+     */
     public MemberDTO join(JoinRequest joinRequest) {
         if (!joinRequest.getPassword().equals(joinRequest.getPassword2())) {
             throw new MemberException(AUTHENTICATION_FAILED);
@@ -53,6 +58,12 @@ public class MemberService {
 
     }
 
+    /**
+     * 로그인
+     * - 회원 존재 확인
+     * - 비밀번호 일치 확인
+     * - accessToken과 refreshToken 부여
+     */
     @Transactional
     public JwtDto login(LoginRequest loginRequest) {
         Member member = memberRepository.findMemberByUsername(loginRequest.getUsername())
@@ -69,14 +80,25 @@ public class MemberService {
         member.setRefreshToken(refreshToken);
         return JwtDto.from(member);
     }
+
+    /**
+     * member id로 회원 조회
+     */
     public Optional<Member> findMemberById(Long id) {
         return memberRepository.findMemberById(id);
     }
 
+    /**
+     * token 일치 확인
+     */
     public boolean verifyWithMemberToken(Member member, String token) {
         return member.getAccessToken().equals(token);
     }
 
+    /**
+     * accessToken 재발행
+     * - 회원의 refreshToken 일치 체크
+     */
     @Transactional
     public JwtDto reissue(String refreshToken) {
         String token = jwtProvider.resolveToken(refreshToken);

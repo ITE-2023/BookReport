@@ -1,5 +1,7 @@
 package com.project.bookreport.exception;
 
+import com.project.bookreport.exception.custom_exceptions.CustomException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * 전역 예외 핸들러
+ */
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
 

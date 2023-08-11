@@ -5,9 +5,9 @@ import static com.project.bookreport.exception.ErrorCode.*;
 import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.Report;
-import com.project.bookreport.exception.BookException;
-import com.project.bookreport.exception.MemberException;
-import com.project.bookreport.exception.ReportException;
+import com.project.bookreport.exception.custom_exceptions.BookException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
+import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
@@ -29,6 +29,9 @@ public class ReportService {
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
 
+    /**
+     * 독후감 생성
+     */
     public ReportDTO create(MemberContext memberContext, ReportRequest reportRequest, BookDTO bookDTO) {
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
@@ -46,13 +49,15 @@ public class ReportService {
             .id(savedReport.getId())
             .title(savedReport.getTitle())
             .content(savedReport.getContent())
-            .memberId(member.getId())
-            .bookId(book.getId())
+            .username(member.getUsername())
             .createDate(savedReport.getCreateDate())
             .updateDate(savedReport.getUpdateDate())
             .build();
     }
 
+    /**
+     * 독후감 수정
+     */
     @Transactional
     public ReportDTO update(MemberContext memberContext, Long id, ReportRequest reportRequest,
         BookDTO bookDTO) {
@@ -71,24 +76,15 @@ public class ReportService {
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
-            .memberId(report.getMember().getId())
-            .bookId(bookDTO.getId())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
     }
 
-    public ReportDTO getReport(Long id) {
-        Report report = findReportById(id);
-        return ReportDTO.builder()
-            .id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build();
-    }
-
+    /**
+     * 독후감 삭제
+     */
     public void delete(MemberContext memberContext, Long id){
         Report report = findReportById(id);
 
@@ -99,27 +95,53 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
+    /**
+     * 독후감 단건 조회 후 DTO로 변환
+     */
+    public ReportDTO getReport(Long id) {
+        Report report = findReportById(id);
+        return ReportDTO.builder()
+            .id(report.getId())
+            .title(report.getTitle())
+            .content(report.getContent())
+            .username(report.getMember().getUsername())
+            .createDate(report.getCreateDate())
+            .updateDate(report.getUpdateDate())
+            .build();
+    }
+
+    /**
+     * 독후감 단건 조회
+     */
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
             .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
     }
 
+    /**
+     * 독후감 전체 조회
+     */
     public List<ReportDTO> getReportList(Pageable pageable) {
         Page<Report> reports = reportRepository.findAll(pageable);
         return reports.stream().map(report -> ReportDTO.builder().id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build()).toList();
     }
 
+    /**
+     * 내 독후감 전체 조회
+     */
     public List<ReportDTO> getMyReportList(MemberContext memberContext, Pageable pageable) {
         List<Report> myReport = reportRepository.findAllByMember_Username(
             memberContext.getUsername(), pageable);
         return myReport.stream().map(report -> ReportDTO.builder().id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build()).toList();

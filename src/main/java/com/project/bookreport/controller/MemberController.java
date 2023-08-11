@@ -14,12 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 회원 API
+ */
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
+    /**
+     * 회원 가입
+     */
     @PostMapping("/member/join")
     public ResponseEntity<MemberDTO> join(@Valid @RequestBody JoinRequest joinRequest){
         MemberDTO memberDTO = memberService.join(joinRequest);
@@ -27,6 +33,9 @@ public class MemberController {
         return ResponseEntity.ok(memberDTO) ;
     }
 
+    /**
+     * 로그인
+     */
     @PostMapping("/member/login")
     public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginRequest loginRequest) {
         JwtDto jwtDto = memberService.login(loginRequest);
@@ -37,6 +46,9 @@ public class MemberController {
             .body(jwtDto);
     }
 
+    /**
+     * accessToken 재발행
+     */
     @PostMapping("/member/reissue")
     public ResponseEntity<JwtDto> reissue(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken) {
