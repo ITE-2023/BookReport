@@ -4,7 +4,7 @@ import static com.project.bookreport.exception.ErrorCode.*;
 
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.status.MemberRole;
-import com.project.bookreport.exception.MemberException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.jwt.JwtDto;
 import com.project.bookreport.model.member.JoinRequest;
 import com.project.bookreport.model.member.LoginRequest;

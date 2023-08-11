@@ -1,5 +1,7 @@
 package com.project.bookreport.exception;
 
+import com.project.bookreport.exception.custom_exceptions.CustomException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
