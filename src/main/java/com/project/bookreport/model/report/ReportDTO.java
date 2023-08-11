@@ -10,8 +10,7 @@ public class ReportDTO {
   private Long id;
   private String title;
   private String content;
-  private Long memberId;
-  private Long bookId;
+  private String username;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
 }

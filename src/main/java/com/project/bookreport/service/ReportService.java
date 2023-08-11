@@ -49,8 +49,7 @@ public class ReportService {
             .id(savedReport.getId())
             .title(savedReport.getTitle())
             .content(savedReport.getContent())
-            .memberId(member.getId())
-            .bookId(book.getId())
+            .username(member.getUsername())
             .createDate(savedReport.getCreateDate())
             .updateDate(savedReport.getUpdateDate())
             .build();
@@ -77,8 +76,7 @@ public class ReportService {
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
-            .memberId(report.getMember().getId())
-            .bookId(bookDTO.getId())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
@@ -106,6 +104,7 @@ public class ReportService {
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
@@ -127,6 +126,7 @@ public class ReportService {
         return reports.stream().map(report -> ReportDTO.builder().id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build()).toList();
@@ -141,6 +141,7 @@ public class ReportService {
         return myReport.stream().map(report -> ReportDTO.builder().id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
+            .username(report.getMember().getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build()).toList();
