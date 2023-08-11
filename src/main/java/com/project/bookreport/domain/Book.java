@@ -2,6 +2,8 @@ package com.project.bookreport.domain;
 
 import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,4 +19,7 @@ public class Book extends BaseEntity {
     private String bookName;
     private String author;
     private String publisher;
+
+    @OneToMany(mappedBy = "book")
+    private List<Report> reportList = new ArrayList<>();
 }
