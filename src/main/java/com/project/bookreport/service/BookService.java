@@ -17,30 +17,32 @@ public class BookService {
     private final BookRepository bookRepository;
 
     public BookDTO create(BookRequest bookRequest){
-        Book book = getBook(bookRequest);
-        return BookDTO.builder()
-            .id(book.getId())
-            .bookName(book.getBookName())
-            .author(book.getAuthor())
-            .publisher(book.getPublisher())
-            .createDate(book.getCreateDate())
-            .updateDate(book.getUpdateDate())
-            .build();
-    }
-
-    private Book getBook(BookRequest bookRequest) {
-        Optional<Book> originBook = bookRepository.findByBookNameAndAuthorAndPublisher(
-            bookRequest.getBookName(),
-            bookRequest.getAuthor(), bookRequest.getPublisher());
-        if(originBook.isEmpty()) {
+        Optional<Book> originBook = getBook(bookRequest);
+        Book saveBook;
+        if (originBook.isEmpty()) {
             Book book = Book.builder()
                 .bookName(bookRequest.getBookName())
                 .author(bookRequest.getAuthor())
                 .publisher(bookRequest.getPublisher())
                 .build();
-            return bookRepository.save(book);
+            saveBook = bookRepository.save(book);
+        } else {
+            saveBook = originBook.get();
         }
-        return originBook.get();
+        return BookDTO.builder()
+            .id(saveBook.getId())
+            .bookName(saveBook.getBookName())
+            .author(saveBook.getAuthor())
+            .publisher(saveBook.getPublisher())
+            .createDate(saveBook.getCreateDate())
+            .updateDate(saveBook.getUpdateDate())
+            .build();
+    }
+
+    private Optional<Book> getBook(BookRequest bookRequest) {
+        return bookRepository.findByBookNameAndAuthorAndPublisher(
+            bookRequest.getBookName(),
+            bookRequest.getAuthor(), bookRequest.getPublisher());
     }
 
     public BookDTO update(Report report, BookRequest bookRequest){
