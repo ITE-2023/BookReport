@@ -20,8 +20,10 @@ public class Report extends BaseEntity {
     private  String content;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)//한번에 값을 다 가져옴--> Member select문도 가져옴
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Book book;
 }

@@ -31,6 +31,11 @@ public class MemberService {
         if (!joinRequest.getPassword().equals(joinRequest.getPassword2())) {
             throw new MemberException(AUTHENTICATION_FAILED);
         }
+
+        if (memberRepository.findByUsername(joinRequest.getUsername()).isPresent()) {
+            throw new MemberException(MEMBER_NOT_UNIQUE);
+        }
+
         Member member = Member.builder()
                 .username(joinRequest.getUsername())
                 .password(passwordEncoder.encode(joinRequest.getPassword()))
