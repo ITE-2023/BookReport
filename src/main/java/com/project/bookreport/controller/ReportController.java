@@ -19,13 +19,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.*;
 
-
+/**
+ * 독후감 API
+ */
 @RestController
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
     private final BookService bookService;
 
+    /**
+     * 독후감 생성
+     */
     @PostMapping("/report/create")
     public ResponseEntity<ReportResponse> create(@AuthenticationPrincipal MemberContext memberContext,
         @Valid @RequestBody ReportVO reportVO){
@@ -39,6 +44,9 @@ public class ReportController {
                 .build());
     }
 
+    /**
+     * 독후감 수정
+     */
     @PatchMapping("/report/update/{id}")
     public ResponseEntity<ReportResponse> update(
         @AuthenticationPrincipal MemberContext memberContext,
@@ -54,18 +62,27 @@ public class ReportController {
                 .build());
     }
 
+    /**
+     * 독후감 삭제
+     */
     @DeleteMapping("/report/delete/{id}")
     public ResponseEntity<Object> delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
         reportService.delete(memberContext, id);
         return ResponseEntity.ok().build();//완료한 값을 던짐
     }
 
+    /**
+     * 독후감 단건 조회
+     */
     @GetMapping("/report/{id}")
     public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
         ReportDTO reportDTO = reportService.getReport(id);
         return ResponseEntity.ok(reportDTO);
     }
 
+    /**
+     * 독후감 전체 조회 (추후, 책별로 조회하는 거로 변경 예정)
+     */
     @GetMapping("/reports")
     public ResponseEntity<List<ReportDTO>> getReportList(
         @PageableDefault(sort = "id", direction = DESC, size = 10)
@@ -74,6 +91,9 @@ public class ReportController {
         return ResponseEntity.ok(reportList);
     }
 
+    /**
+     * 내 독후감 전체 조회
+     */
     @GetMapping("/myReports")
     public ResponseEntity<List<ReportDTO>> getMyReportList(
         @AuthenticationPrincipal MemberContext memberContext,

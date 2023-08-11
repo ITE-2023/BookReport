@@ -29,6 +29,9 @@ public class ReportService {
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
 
+    /**
+     * 독후감 생성
+     */
     public ReportDTO create(MemberContext memberContext, ReportRequest reportRequest, BookDTO bookDTO) {
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
@@ -53,6 +56,9 @@ public class ReportService {
             .build();
     }
 
+    /**
+     * 독후감 수정
+     */
     @Transactional
     public ReportDTO update(MemberContext memberContext, Long id, ReportRequest reportRequest,
         BookDTO bookDTO) {
@@ -78,6 +84,22 @@ public class ReportService {
             .build();
     }
 
+    /**
+     * 독후감 삭제
+     */
+    public void delete(MemberContext memberContext, Long id){
+        Report report = findReportById(id);
+
+        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
+            throw new ReportException(ACCESS_DENIED);
+        }
+
+        reportRepository.delete(report);
+    }
+
+    /**
+     * 독후감 단건 조회 후 DTO로 변환
+     */
     public ReportDTO getReport(Long id) {
         Report report = findReportById(id);
         return ReportDTO.builder()
@@ -89,21 +111,17 @@ public class ReportService {
             .build();
     }
 
-    public void delete(MemberContext memberContext, Long id){
-        Report report = findReportById(id);
-
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-            throw new ReportException(ACCESS_DENIED);
-        }
-
-        reportRepository.delete(report);
-    }
-
+    /**
+     * 독후감 단건 조회
+     */
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
             .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
     }
 
+    /**
+     * 독후감 전체 조회
+     */
     public List<ReportDTO> getReportList(Pageable pageable) {
         Page<Report> reports = reportRepository.findAll(pageable);
         return reports.stream().map(report -> ReportDTO.builder().id(report.getId())
@@ -114,6 +132,9 @@ public class ReportService {
             .build()).toList();
     }
 
+    /**
+     * 내 독후감 전체 조회
+     */
     public List<ReportDTO> getMyReportList(MemberContext memberContext, Pageable pageable) {
         List<Report> myReport = reportRepository.findAllByMember_Username(
             memberContext.getUsername(), pageable);
