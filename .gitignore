@@ -38,3 +38,4 @@ out/
 
 application-dev.yml
 application-test.yml
+data.sql

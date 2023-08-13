@@ -35,6 +35,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
             .requestMatchers("/member/join", "/member/login", "/member/reissue").permitAll()
+            .requestMatchers("/book/create").hasRole("ADMIN")
             .anyRequest().authenticated())
         .cors().configurationSource(corsConfigurationSource()) // 타 도메인에서 API 접근 허용
         .and()
