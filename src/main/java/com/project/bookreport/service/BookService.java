@@ -1,12 +1,15 @@
 package com.project.bookreport.service;
 
 import com.project.bookreport.domain.Book;
+import com.project.bookreport.exception.ErrorCode;
+import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.repository.BookRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,33 @@ public class BookService {
             .createDate(saveBook.getCreateDate())
             .updateDate(saveBook.getUpdateDate())
             .build();
+    }
+    public void delete(Long id){
+        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
+        if(book.getReportList().size() == 0){
+            bookRepository.delete(book);
+        }
+    }
+    @Transactional
+    public BookDTO update(BookRequest bookRequest, Long id){
+        Book book = findBookById(id);
+        book.setBookName(bookRequest.getBookName());
+        book.setAuthor(bookRequest.getAuthor());
+        book.setPublisher(bookRequest.getPublisher());
+        return BookDTO.builder()
+                .id(book.getId())
+                .bookName(book.getBookName())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .createDate(book.getCreateDate())
+                .updateDate(book.getUpdateDate())
+                .build();
+
+    }
+
+    private Book findBookById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
     }
 
     /**
