@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,7 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
+    private final BookService bookService;
 
     /**
      * 독후감 생성
@@ -58,7 +58,6 @@ public class ReportService {
     /**
      * 독후감 수정
      */
-    @Transactional
     public ReportDTO update(MemberContext memberContext, Long id, ReportRequest reportRequest,
         BookDTO bookDTO) {
 
@@ -66,12 +65,15 @@ public class ReportService {
         if (!report.getMember().getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
+        Long originBookId = report.getBook().getId();
         Book book = bookRepository.findById(bookDTO.getId())
             .orElseThrow(() ->new BookException(BOOK_NOT_FOUND));
 
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
         report.setBook(book);
+        reportRepository.save(report);
+        bookService.delete(originBookId);
         return ReportDTO.builder()
             .id(report.getId())
             .title(report.getTitle())
@@ -91,8 +93,9 @@ public class ReportService {
         if(!report.getMember().getUsername().equals(memberContext.getUsername())){
             throw new ReportException(ACCESS_DENIED);
         }
-
+        Book book = report.getBook();
         reportRepository.delete(report);
+        bookService.delete(book.getId());
     }
 
     /**
