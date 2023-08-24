@@ -20,6 +20,9 @@ public class Book extends BaseEntity {
     private String author;
     private String publisher;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
     private List<Report> reportList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    private List<MemberBook> memberList = new ArrayList<>();
 }
