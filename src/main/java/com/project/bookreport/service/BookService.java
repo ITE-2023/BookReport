@@ -63,7 +63,7 @@ public class BookService {
     }
     public void delete(Long id){
         Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
-        if(book.getReportList().size() == 0){
+        if(book.getReportList().isEmpty()){
             bookRepository.delete(book);
         }
     }
@@ -115,8 +115,12 @@ public class BookService {
         headers.set("X-Naver-Client-Id", ID);
         headers.set("X-Naver-Client-Secret", SECRET);
         HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
-        return restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity, BookSearchDTO.class)
-            .getBody();
+        try {
+            return restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity, BookSearchDTO.class)
+                .getBody();
+        } catch (Exception e) {
+            throw new BookException(ErrorCode.BOOK_SEARCH_FAIL);
+        }
     }
 }
 
