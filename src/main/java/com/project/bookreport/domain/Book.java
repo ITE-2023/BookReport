@@ -15,11 +15,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class Book extends BaseEntity {
-    @Column(length = 20)
+    @Column(length = 20, unique = true)
+    private String isbn;
     private String bookName;
     private String author;
     private String publisher;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
     private List<Report> reportList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    private List<MemberBook> memberList = new ArrayList<>();
 }
