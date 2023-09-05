@@ -61,10 +61,20 @@ public class BookController {
   /**
    * 내 서재에 담기
    */
-  @PostMapping("/book/addMyBook")
-  public ResponseEntity<BookDTO> saveMyBook(@AuthenticationPrincipal MemberContext memberContext,
+  @PostMapping("/myBook/save")
+  public ResponseEntity<Object> saveMyBook(@AuthenticationPrincipal MemberContext memberContext,
      @Valid @RequestBody BookRequest bookRequest) {
     bookService.saveMyBook(memberContext, bookRequest);
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 내 서재에서 삭제
+   */
+  @DeleteMapping("/myBook/delete/{isbn}")
+  public ResponseEntity<Object> deleteMyBook(@AuthenticationPrincipal MemberContext memberContext,
+      @PathVariable("isbn") String isbn) {
+    bookService.deleteMyBook(memberContext, isbn);
     return ResponseEntity.ok().build();
   }
 }

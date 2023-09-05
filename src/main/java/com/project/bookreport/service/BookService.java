@@ -62,7 +62,7 @@ public class BookService {
     }
 
     private Book getSaveBook(BookRequest bookRequest) {
-        Optional<Book> originBook = getBook(bookRequest);
+        Optional<Book> originBook = getBook(bookRequest.getIsbn());
         Book saveBook;
         if (originBook.isEmpty()) {
             Book book = Book.builder()
@@ -109,8 +109,8 @@ public class BookService {
     /**
      * isbn이 일치하는 책 조회
      */
-    private Optional<Book> getBook(BookRequest bookRequest) {
-        return bookRepository.findByIsbn(bookRequest.getIsbn());
+    private Optional<Book> getBook(String isbn) {
+        return bookRepository.findByIsbn(isbn);
     }
 
     /**
@@ -138,6 +138,11 @@ public class BookService {
         }
     }
 
+    /**
+     * 내 서재에 추가
+     * - Book이 DB에 없다면 생성, 있다면 저장된 책 리턴
+     * - Member와 Book 연결
+     */
     public void saveMyBook(MemberContext memberContext, BookRequest bookRequest) {
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
@@ -152,6 +157,20 @@ public class BookService {
             .member(member)
             .build();
         memberBookRepository.save(memberBook);
+    }
+
+    /**
+     * 내 서재에서 삭제
+     */
+    public void deleteMyBook(MemberContext memberContext, String isbn) {
+        Member member = memberRepository.findMemberById(memberContext.getId())
+            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
+        Book book = getBook(isbn).orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
+
+        MemberBook memberBook = memberBookRepository.findByMemberAndBook(member, book)
+            .orElseThrow(() -> new BookException(MEMBER_BOOK_NOT_FOUND));
+
+        memberBookRepository.delete(memberBook);
     }
 }
 
