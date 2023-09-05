@@ -148,7 +148,7 @@ public class BookService {
         Book book = getBook(isbn).orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
 
         MyBook myBook = myBookRepository.findByMemberAndBook(member, book)
-            .orElseThrow(() -> new BookException(MEMBER_BOOK_NOT_FOUND));
+            .orElseThrow(() -> new BookException(MY_BOOK_NOT_FOUND));
 
         myBookRepository.delete(myBook);
     }
