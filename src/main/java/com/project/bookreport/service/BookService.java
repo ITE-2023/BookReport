@@ -5,16 +5,34 @@ import com.project.bookreport.exception.ErrorCode;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
+import com.project.bookreport.model.book.BookSearchDTO;
 import com.project.bookreport.repository.BookRepository;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+
+    @Value("${book.searchUrl}")
+    private String BOOK_SEARCH_URL;
+
+    @Value("${book.id}")
+    private String ID;
+
+    @Value("${book.secret}")
+    private String SECRET;
 
     /**
      * 책 생성
@@ -45,7 +63,7 @@ public class BookService {
     }
     public void delete(Long id){
         Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
-        if(book.getReportList().size() == 0){
+        if(book.getReportList().isEmpty()){
             bookRepository.delete(book);
         }
     }
@@ -78,6 +96,31 @@ public class BookService {
         return bookRepository.findByBookNameAndAuthorAndPublisher(
             bookRequest.getBookName(),
             bookRequest.getAuthor(), bookRequest.getPublisher());
+    }
+
+    /**
+     * 네이버 API - 책 검색
+     */
+    public BookSearchDTO search(String keyword) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        URI targetUrl = UriComponentsBuilder
+            .fromUriString(BOOK_SEARCH_URL)
+            .queryParam("query", keyword)
+            .queryParam("display", 10)
+            .build()
+            .encode(StandardCharsets.UTF_8)
+            .toUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Naver-Client-Id", ID);
+        headers.set("X-Naver-Client-Secret", SECRET);
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+        try {
+            return restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity, BookSearchDTO.class)
+                .getBody();
+        } catch (Exception e) {
+            throw new BookException(ErrorCode.BOOK_SEARCH_FAIL);
+        }
     }
 }
 
