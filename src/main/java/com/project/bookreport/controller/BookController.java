@@ -3,13 +3,10 @@ package com.project.bookreport.controller;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
-import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.service.BookService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -57,15 +54,5 @@ public class BookController {
   public ResponseEntity<BookSearchDTO> search(@RequestParam("query") String keyword) {
     BookSearchDTO bookSearchDTO = bookService.search(keyword);
     return ResponseEntity.ok(bookSearchDTO);
-  }
-
-  /**
-   * 내 서재 조회
-   */
-  @GetMapping("/myBook")
-  public ResponseEntity<List<BookDTO>> findMyBooks(
-      @AuthenticationPrincipal MemberContext memberContext) {
-    List<BookDTO> myBooks = bookService.findMyBooks(memberContext);
-    return ResponseEntity.ok(myBooks);
   }
 }

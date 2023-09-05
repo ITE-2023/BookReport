@@ -16,10 +16,13 @@ import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookRequest;
+import com.project.bookreport.model.myBook.MyBookResponse;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,5 +108,39 @@ public class MyBookService {
     }
 
     myBookRepository.delete(myBook);
+  }
+
+  public List<MyBookResponse> myBooks(MemberContext memberContext, Pageable pageable, Integer year) {
+    Member member = memberRepository.findMemberById(memberContext.getId())
+        .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
+
+    return myBookRepository.findAllByMember(pageable, member, year).stream()
+        .map(myBook -> {
+          Book book = myBook.getBook();
+          BookDTO bookDto = BookDTO.builder()
+              .id(book.getId())
+              .isbn(book.getIsbn())
+              .bookName(book.getBookName())
+              .author(book.getAuthor())
+              .publisher(book.getPublisher())
+              .createDate(book.getCreateDate())
+              .updateDate(book.getUpdateDate())
+              .build();
+
+          MyBookDTO myBookDTO = MyBookDTO.builder()
+              .id(myBook.getId())
+              .myBookStatus(myBook.getMyBookStatus())
+              .rate(myBook.getRate())
+              .startDate(myBook.getStartDate())
+              .endDate(myBook.getEndDate())
+              .createDate(myBook.getCreateDate())
+              .updateDate(myBook.getUpdateDate())
+              .build();
+
+          return MyBookResponse.builder()
+              .bookDTO(bookDto)
+              .myBookDTO(myBookDTO)
+              .build();
+        }).toList();
   }
 }

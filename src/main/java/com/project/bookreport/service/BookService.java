@@ -1,23 +1,16 @@
 package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
-import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
-
 import com.project.bookreport.domain.Book;
-import com.project.bookreport.domain.Member;
-import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
-import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
-import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -137,27 +130,6 @@ public class BookService {
         } catch (Exception e) {
             throw new BookException(BOOK_SEARCH_FAIL);
         }
-    }
-
-    /**
-     * 회원별 책 조회
-     */
-    public List<BookDTO> findMyBooks(MemberContext memberContext) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        List<MyBook> myBooks = myBookRepository.findAllByMember(member);
-        return myBooks.stream().map(myBook -> {
-            Book book = myBook.getBook();
-            return BookDTO.builder()
-                .id(book.getId())
-                .isbn(book.getIsbn())
-                .bookName(book.getBookName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .createDate(book.getCreateDate())
-                .updateDate(book.getUpdateDate())
-                .build();
-        }).toList();
     }
 }
 
