@@ -6,6 +6,7 @@ import com.project.bookreport.model.book.BookSearchDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.service.BookService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -76,5 +77,15 @@ public class BookController {
       @PathVariable("isbn") String isbn) {
     bookService.deleteMyBook(memberContext, isbn);
     return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 내 서재 조회
+   */
+  @GetMapping("/myBook")
+  public ResponseEntity<List<BookDTO>> findMyBooks(
+      @AuthenticationPrincipal MemberContext memberContext) {
+    List<BookDTO> myBooks = bookService.findMyBooks(memberContext);
+    return ResponseEntity.ok(myBooks);
   }
 }

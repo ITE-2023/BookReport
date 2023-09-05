@@ -17,6 +17,7 @@ import com.project.bookreport.repository.MemberBookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,6 +172,27 @@ public class BookService {
             .orElseThrow(() -> new BookException(MEMBER_BOOK_NOT_FOUND));
 
         memberBookRepository.delete(memberBook);
+    }
+
+    /**
+     * 회원별 책 조회
+     */
+    public List<BookDTO> findMyBooks(MemberContext memberContext) {
+        Member member = memberRepository.findMemberById(memberContext.getId())
+            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
+        List<MemberBook> memberBooks = memberBookRepository.findAllByMember(member);
+        return memberBooks.stream().map(memberBook -> {
+            Book book = memberBook.getBook();
+            return BookDTO.builder()
+                .id(book.getId())
+                .isbn(book.getIsbn())
+                .bookName(book.getBookName())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .createDate(book.getCreateDate())
+                .updateDate(book.getUpdateDate())
+                .build();
+        }).toList();
     }
 }
 

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class BookDTO {
     private Long id;
+    private String isbn;
     private String bookName;
     private String author;
     private String publisher;
