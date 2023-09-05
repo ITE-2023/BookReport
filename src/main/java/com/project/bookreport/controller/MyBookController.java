@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,5 +45,15 @@ public class MyBookController {
       @PathVariable("id") Long id, @Valid @RequestBody MyBookRequest myBookRequest) {
     MyBookDTO myBookDTO = myBookService.update(memberContext, id, myBookRequest);
     return ResponseEntity.ok(myBookDTO);
+  }
+
+  /**
+   * 내 서재에 담긴 책 삭제
+   */
+  @DeleteMapping("/myBook/delete/{id}")
+  public ResponseEntity<Object> deleteMyBook(@AuthenticationPrincipal MemberContext memberContext,
+      @PathVariable("id") Long id) {
+    myBookService.delete(memberContext, id);
+    return ResponseEntity.ok().build();
   }
 }

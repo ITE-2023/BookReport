@@ -92,4 +92,18 @@ public class MyBookService {
         .updateDate(myBook.getUpdateDate())
         .build();
   }
+
+  /**
+   * 내 서재에서 삭제
+   */
+  public void delete(MemberContext memberContext, Long id) {
+    MyBook myBook = myBookRepository.findById(id)
+        .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+
+    if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
+      throw new MyBookException(ACCESS_DENIED);
+    }
+
+    myBookRepository.delete(myBook);
+  }
 }

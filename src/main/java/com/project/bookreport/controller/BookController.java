@@ -60,16 +60,6 @@ public class BookController {
   }
 
   /**
-   * 내 서재에서 삭제
-   */
-  @DeleteMapping("/myBook/delete/{isbn}")
-  public ResponseEntity<Object> deleteMyBook(@AuthenticationPrincipal MemberContext memberContext,
-      @PathVariable("isbn") String isbn) {
-    bookService.deleteMyBook(memberContext, isbn);
-    return ResponseEntity.ok().build();
-  }
-
-  /**
    * 내 서재 조회
    */
   @GetMapping("/myBook")

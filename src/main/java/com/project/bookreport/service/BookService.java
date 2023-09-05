@@ -140,20 +140,6 @@ public class BookService {
     }
 
     /**
-     * 내 서재에서 삭제
-     */
-    public void deleteMyBook(MemberContext memberContext, String isbn) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        Book book = getBook(isbn).orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
-
-        MyBook myBook = myBookRepository.findByMemberAndBook(member, book)
-            .orElseThrow(() -> new BookException(MY_BOOK_NOT_FOUND));
-
-        myBookRepository.delete(myBook);
-    }
-
-    /**
      * 회원별 책 조회
      */
     public List<BookDTO> findMyBooks(MemberContext memberContext) {
