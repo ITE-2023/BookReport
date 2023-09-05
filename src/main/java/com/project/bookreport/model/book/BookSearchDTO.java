@@ -21,5 +21,6 @@ public class BookSearchDTO {
     public String author;
     public String isbn;
     public String publisher;
+    public String description;
   }
 }
