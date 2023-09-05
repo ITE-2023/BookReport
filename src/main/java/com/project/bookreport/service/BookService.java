@@ -1,12 +1,20 @@
 package com.project.bookreport.service;
 
+import static com.project.bookreport.exception.ErrorCode.*;
+import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
+
 import com.project.bookreport.domain.Book;
-import com.project.bookreport.exception.ErrorCode;
+import com.project.bookreport.domain.Member;
+import com.project.bookreport.domain.MemberBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
+import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.repository.BookRepository;
+import com.project.bookreport.repository.MemberBookRepository;
+import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -24,6 +32,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+    private final MemberRepository memberRepository;
+    private final MemberBookRepository memberBookRepository;
 
     @Value("${book.searchUrl}")
     private String BOOK_SEARCH_URL;
@@ -40,18 +50,7 @@ public class BookService {
      * - 기존에 생성되지 않았다면, 생성 후 return
      */
     public BookDTO create(BookRequest bookRequest){
-        Optional<Book> originBook = getBook(bookRequest);
-        Book saveBook;
-        if (originBook.isEmpty()) {
-            Book book = Book.builder()
-                .bookName(bookRequest.getBookName())
-                .author(bookRequest.getAuthor())
-                .publisher(bookRequest.getPublisher())
-                .build();
-            saveBook = bookRepository.save(book);
-        } else {
-            saveBook = originBook.get();
-        }
+        Book saveBook = getSaveBook(bookRequest);
         return BookDTO.builder()
             .id(saveBook.getId())
             .bookName(saveBook.getBookName())
@@ -61,8 +60,26 @@ public class BookService {
             .updateDate(saveBook.getUpdateDate())
             .build();
     }
+
+    private Book getSaveBook(BookRequest bookRequest) {
+        Optional<Book> originBook = getBook(bookRequest);
+        Book saveBook;
+        if (originBook.isEmpty()) {
+            Book book = Book.builder()
+                .bookName(bookRequest.getBookName())
+                .author(bookRequest.getAuthor())
+                .publisher(bookRequest.getPublisher())
+                .isbn(bookRequest.getIsbn())
+                .build();
+            saveBook = bookRepository.save(book);
+        } else {
+            saveBook = originBook.get();
+        }
+        return saveBook;
+    }
+
     public void delete(Long id){
-        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
+        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
         if(book.getReportList().isEmpty()){
             bookRepository.delete(book);
         }
@@ -86,16 +103,14 @@ public class BookService {
 
     private Book findBookById(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(()-> new BookException(ErrorCode.BOOK_NOT_FOUND));
+                .orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
     }
 
     /**
-     * 책 이름, 작가, 출판사가 일치하는 책 조회
+     * isbn이 일치하는 책 조회
      */
     private Optional<Book> getBook(BookRequest bookRequest) {
-        return bookRepository.findByBookNameAndAuthorAndPublisher(
-            bookRequest.getBookName(),
-            bookRequest.getAuthor(), bookRequest.getPublisher());
+        return bookRepository.findByIsbn(bookRequest.getIsbn());
     }
 
     /**
@@ -119,8 +134,24 @@ public class BookService {
             return restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity, BookSearchDTO.class)
                 .getBody();
         } catch (Exception e) {
-            throw new BookException(ErrorCode.BOOK_SEARCH_FAIL);
+            throw new BookException(BOOK_SEARCH_FAIL);
         }
+    }
+
+    public void saveMyBook(MemberContext memberContext, BookRequest bookRequest) {
+        Member member = memberRepository.findMemberById(memberContext.getId())
+            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
+        Book saveBook = getSaveBook(bookRequest);
+
+        if (memberBookRepository.findByMemberAndBook(member, saveBook).isPresent()) {
+            throw new BookException(MEMBER_BOOK_NOT_UNIQUE);
+        }
+
+        MemberBook memberBook = MemberBook.builder()
+            .book(saveBook)
+            .member(member)
+            .build();
+        memberBookRepository.save(memberBook);
     }
 }
 

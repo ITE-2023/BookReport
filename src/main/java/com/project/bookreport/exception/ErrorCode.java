@@ -20,8 +20,9 @@ public enum ErrorCode {
   REPORT_NOT_FOUND(404, "존재하지 않는 독후감입니다."),
 
   BOOK_NOT_FOUND(404, "존재하지 않는 책입니다."),
-  BOOK_SEARCH_FAIL(400, "해당 검색어에 대한 검색 결과가 없습니다.");
+  BOOK_SEARCH_FAIL(400, "해당 검색어에 대한 검색 결과가 없습니다."),
 
+  MEMBER_BOOK_NOT_UNIQUE(409, "이미 내 서재에 추가되었습니다.");
   private final int status;
   private final String msg;
 }
