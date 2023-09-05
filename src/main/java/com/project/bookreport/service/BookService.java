@@ -5,7 +5,7 @@ import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Member;
-import com.project.bookreport.domain.MemberBook;
+import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.book.BookDTO;
@@ -13,7 +13,7 @@ import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.repository.BookRepository;
-import com.project.bookreport.repository.MemberBookRepository;
+import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class BookService {
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
-    private final MemberBookRepository memberBookRepository;
+    private final MyBookRepository myBookRepository;
 
     @Value("${book.searchUrl}")
     private String BOOK_SEARCH_URL;
@@ -140,27 +140,6 @@ public class BookService {
     }
 
     /**
-     * 내 서재에 추가
-     * - Book이 DB에 없다면 생성, 있다면 저장된 책 리턴
-     * - Member와 Book 연결
-     */
-    public void saveMyBook(MemberContext memberContext, BookRequest bookRequest) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        Book saveBook = getSaveBook(bookRequest);
-
-        if (memberBookRepository.findByMemberAndBook(member, saveBook).isPresent()) {
-            throw new BookException(MEMBER_BOOK_NOT_UNIQUE);
-        }
-
-        MemberBook memberBook = MemberBook.builder()
-            .book(saveBook)
-            .member(member)
-            .build();
-        memberBookRepository.save(memberBook);
-    }
-
-    /**
      * 내 서재에서 삭제
      */
     public void deleteMyBook(MemberContext memberContext, String isbn) {
@@ -168,10 +147,10 @@ public class BookService {
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
         Book book = getBook(isbn).orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
 
-        MemberBook memberBook = memberBookRepository.findByMemberAndBook(member, book)
+        MyBook myBook = myBookRepository.findByMemberAndBook(member, book)
             .orElseThrow(() -> new BookException(MEMBER_BOOK_NOT_FOUND));
 
-        memberBookRepository.delete(memberBook);
+        myBookRepository.delete(myBook);
     }
 
     /**
@@ -180,9 +159,9 @@ public class BookService {
     public List<BookDTO> findMyBooks(MemberContext memberContext) {
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        List<MemberBook> memberBooks = memberBookRepository.findAllByMember(member);
-        return memberBooks.stream().map(memberBook -> {
-            Book book = memberBook.getBook();
+        List<MyBook> myBooks = myBookRepository.findAllByMember(member);
+        return myBooks.stream().map(myBook -> {
+            Book book = myBook.getBook();
             return BookDTO.builder()
                 .id(book.getId())
                 .isbn(book.getIsbn())

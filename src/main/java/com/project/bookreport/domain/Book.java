@@ -25,5 +25,5 @@ public class Book extends BaseEntity {
     private List<Report> reportList = new ArrayList<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<MemberBook> memberList = new ArrayList<>();
+    private List<MyBook> memberList = new ArrayList<>();
 }
