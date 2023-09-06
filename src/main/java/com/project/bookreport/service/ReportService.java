@@ -11,7 +11,6 @@ import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportRequest;
-import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
@@ -24,9 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
-    private final BookRepository bookRepository;
-    private final BookService bookService;
-
     private final MyBookRepository myBookRepository;
 
     /**

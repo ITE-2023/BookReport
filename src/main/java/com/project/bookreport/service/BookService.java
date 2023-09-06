@@ -77,10 +77,9 @@ public class BookService {
         return saveBook;
     }
 
-    public void delete(Long id){
-        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
-        bookRepository.delete(book);
-    }
+    /**
+     * 책 수정
+     */
     @Transactional
     public BookDTO update(BookRequest bookRequest, Long id){
         Book book = findBookById(id);
@@ -104,6 +103,17 @@ public class BookService {
 
     }
 
+    /**
+     * 책 삭제
+     */
+    public void delete(Long id){
+        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
+        bookRepository.delete(book);
+    }
+
+    /**
+     * 책 조회 (id)
+     */
     private Book findBookById(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
