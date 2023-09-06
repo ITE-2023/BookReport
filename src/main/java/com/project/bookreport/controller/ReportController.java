@@ -2,10 +2,8 @@ package com.project.bookreport.controller;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
-import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
-import com.project.bookreport.model.report.ReportResponse;
-import com.project.bookreport.model.report.ReportVO;
+import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
@@ -31,35 +29,24 @@ public class ReportController {
     /**
      * 독후감 생성
      */
-    @PostMapping("/report/create")
-    public ResponseEntity<ReportResponse> create(@AuthenticationPrincipal MemberContext memberContext,
-        @Valid @RequestBody ReportVO reportVO){
-        BookDTO bookDTO = bookService.create(reportVO.getBookRequest());
-        ReportDTO reportDTO = reportService.create(memberContext, reportVO.getReportRequest(), bookDTO);
-        return ResponseEntity.ok(
-            ReportResponse
-                .builder()
-                .bookDTO(bookDTO)
-                .reportDTO(reportDTO)
-                .build());
+    @PostMapping("/report/create/{id}")
+    public ResponseEntity<ReportDTO> create(@AuthenticationPrincipal MemberContext memberContext,
+        @PathVariable("id") Long myBookId,
+        @Valid @RequestBody ReportRequest reportRequest){
+        ReportDTO reportDTO = reportService.create(memberContext, myBookId, reportRequest);
+        return ResponseEntity.ok(reportDTO);
     }
 
     /**
      * 독후감 수정
      */
     @PatchMapping("/report/update/{id}")
-    public ResponseEntity<ReportResponse> update(
+    public ResponseEntity<ReportDTO> update(
         @AuthenticationPrincipal MemberContext memberContext,
         @PathVariable("id") Long id,
-        @Valid @RequestBody ReportVO reportVO){
-        BookDTO bookDTO = bookService.create(reportVO.getBookRequest());
-        ReportDTO reportDTO = reportService.update(memberContext, id, reportVO.getReportRequest(), bookDTO);
-        return ResponseEntity.ok(
-            ReportResponse
-                .builder()
-                .bookDTO(bookDTO)
-                .reportDTO(reportDTO)
-                .build());
+        @Valid @RequestBody ReportRequest reportRequest){
+        ReportDTO reportDTO = reportService.update(memberContext, id, reportRequest);
+        return ResponseEntity.ok(reportDTO);
     }
 
     /**
@@ -72,10 +59,10 @@ public class ReportController {
     }
 
     /**
-     * 독후감 단건 조회
+     * 독후감 조회
      */
-    @GetMapping("/report/{id}")
-    public ResponseEntity<ReportDTO> getReport(@PathVariable Long id) {
+    @GetMapping("/report/detail/{id}")
+    public ResponseEntity<ReportDTO> getReport(@PathVariable("id") Long id) {
         ReportDTO reportDTO = reportService.getReport(id);
         return ResponseEntity.ok(reportDTO);
     }
