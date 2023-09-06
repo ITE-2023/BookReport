@@ -66,7 +66,7 @@ public class MyBookController {
   }
 
   /**
-   * 내 서재에 담긴 책 조회
+   * 내 서재에 담긴 책 리스트 조회
    */
   @GetMapping("/myBooks")
   public ResponseEntity<List<MyBookResponse>> myBooks(

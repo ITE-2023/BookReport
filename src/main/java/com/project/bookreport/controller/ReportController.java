@@ -1,17 +1,12 @@
 package com.project.bookreport.controller;
 
-import static org.springframework.data.domain.Sort.Direction.*;
-
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -62,31 +57,8 @@ public class ReportController {
      * 독후감 조회
      */
     @GetMapping("/report/detail/{id}")
-    public ResponseEntity<ReportDTO> getReport(@PathVariable("id") Long id) {
-        ReportDTO reportDTO = reportService.getReport(id);
+    public ResponseEntity<ReportDTO> getReport(@PathVariable("id") Long myBookId) {
+        ReportDTO reportDTO = reportService.getReport(myBookId);
         return ResponseEntity.ok(reportDTO);
-    }
-
-    /**
-     * 독후감 전체 조회 (추후, 책별로 조회하는 거로 변경 예정)
-     */
-    @GetMapping("/reports")
-    public ResponseEntity<List<ReportDTO>> getReportList(
-        @PageableDefault(sort = "id", direction = DESC, size = 10)
-        Pageable pageable) {
-        List<ReportDTO> reportList = reportService.getReportList(pageable);
-        return ResponseEntity.ok(reportList);
-    }
-
-    /**
-     * 내 독후감 전체 조회
-     */
-    @GetMapping("/myReports")
-    public ResponseEntity<List<ReportDTO>> getMyReportList(
-        @AuthenticationPrincipal MemberContext memberContext,
-        @PageableDefault(sort = "id", direction = DESC, size = 10) Pageable pageable
-    ) {
-        List<ReportDTO> myReportList = reportService.getMyReportList(memberContext, pageable);
-        return ResponseEntity.ok(myReportList);
     }
 }

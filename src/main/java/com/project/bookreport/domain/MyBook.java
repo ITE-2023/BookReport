@@ -4,6 +4,7 @@ import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,4 +32,7 @@ public class MyBook extends BaseEntity {
   private Integer rate;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
+
+  @OneToOne(mappedBy = "myBook")
+  private Report report;
 }

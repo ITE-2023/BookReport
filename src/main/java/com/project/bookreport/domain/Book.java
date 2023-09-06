@@ -2,8 +2,6 @@ package com.project.bookreport.domain;
 
 import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,10 +21,4 @@ public class Book extends BaseEntity {
     @Lob
     private String description;
     private String imageUrl;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<Report> reportList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<MyBook> memberList = new ArrayList<>();
 }

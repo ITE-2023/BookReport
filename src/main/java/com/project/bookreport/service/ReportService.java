@@ -15,10 +15,7 @@ import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,10 +93,12 @@ public class ReportService {
     }
 
     /**
-     * 독후감 단건 조회 후 DTO로 변환
+     * 독후감 단건 조회
      */
-    public ReportDTO getReport(Long id) {
-        Report report = findReportById(id);
+    public ReportDTO getReport(Long myBookId) {
+        MyBook myBook = myBookRepository.findById(myBookId)
+            .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+        Report report = myBook.getReport();
         return ReportDTO.builder()
             .id(report.getId())
             .title(report.getTitle())
@@ -111,39 +110,10 @@ public class ReportService {
     }
 
     /**
-     * 독후감 단건 조회
+     * 독후감 조회
      */
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
             .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
-    }
-
-    /**
-     * 독후감 전체 조회
-     */
-    public List<ReportDTO> getReportList(Pageable pageable) {
-        Page<Report> reports = reportRepository.findAll(pageable);
-        return reports.stream().map(report -> ReportDTO.builder().id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .username(report.getMember().getUsername())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build()).toList();
-    }
-
-    /**
-     * 내 독후감 전체 조회
-     */
-    public List<ReportDTO> getMyReportList(MemberContext memberContext, Pageable pageable) {
-        List<Report> myReport = reportRepository.findAllByMember_Username(
-            memberContext.getUsername(), pageable);
-        return myReport.stream().map(report -> ReportDTO.builder().id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .username(report.getMember().getUsername())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build()).toList();
     }
 }

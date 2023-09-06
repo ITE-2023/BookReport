@@ -110,6 +110,9 @@ public class MyBookService {
     myBookRepository.delete(myBook);
   }
 
+  /**
+   * 내 서재 속 책 리스트 조회
+   */
   public List<MyBookResponse> myBooks(MemberContext memberContext, Pageable pageable, Integer year) {
     Member member = memberRepository.findMemberById(memberContext.getId())
         .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
