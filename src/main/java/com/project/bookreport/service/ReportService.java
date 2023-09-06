@@ -2,15 +2,14 @@ package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
 
-import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.domain.Report;
-import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
 import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportRequest;
+import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
@@ -24,21 +23,27 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
     private final MyBookRepository myBookRepository;
+    private final BookRepository bookRepository;
 
     /**
      * 독후감 생성
      */
     public ReportDTO create(MemberContext memberContext, Long myBookId, ReportRequest reportRequest) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
         MyBook myBook = myBookRepository.findById(myBookId)
             .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
-        // 마이북과 회원 일치 비교
+        if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
+            throw new ReportException(ACCESS_DENIED);
+        }
+
+        if (myBook.getReport().getId() != null) {
+            throw new ReportException(REPORT_EXIST);
+        }
 
         Report report = Report.builder()
             .title(reportRequest.getTitle())
             .content(reportRequest.getContent())
-            .member(member)
+            .member(myBook.getMember())
+            .book(myBook.getBook())
             .myBook(myBook)
             .build();
         Report savedReport = reportRepository.save(report);
@@ -46,7 +51,7 @@ public class ReportService {
             .id(savedReport.getId())
             .title(savedReport.getTitle())
             .content(savedReport.getContent())
-            .username(member.getUsername())
+            .username(myBook.getMember().getUsername())
             .createDate(savedReport.getCreateDate())
             .updateDate(savedReport.getUpdateDate())
             .build();

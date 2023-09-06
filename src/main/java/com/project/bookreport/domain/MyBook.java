@@ -1,6 +1,7 @@
 package com.project.bookreport.domain;
 
 import com.project.bookreport.domain.base.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -33,6 +34,6 @@ public class MyBook extends BaseEntity {
   private LocalDateTime startDate;
   private LocalDateTime endDate;
 
-  @OneToOne(mappedBy = "myBook")
+  @OneToOne(mappedBy = "myBook", cascade = CascadeType.REMOVE)
   private Report report;
 }

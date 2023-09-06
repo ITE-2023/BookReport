@@ -18,6 +18,7 @@ public enum ErrorCode {
   AUTHENTICATION_FAILED(400, "아이디 또는 비밀번호가 옳지 않습니다."),
 
   REPORT_NOT_FOUND(404, "존재하지 않는 독후감입니다."),
+  REPORT_EXIST(409, "이미 독후감이 존재합니다."),
 
   BOOK_NOT_FOUND(404, "존재하지 않는 책입니다."),
   BOOK_SEARCH_FAIL(400, "해당 검색어에 대한 검색 결과가 없습니다."),
