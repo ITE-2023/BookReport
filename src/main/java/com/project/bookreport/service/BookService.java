@@ -47,9 +47,12 @@ public class BookService {
         Book saveBook = getSaveBook(bookRequest);
         return BookDTO.builder()
             .id(saveBook.getId())
+            .isbn(saveBook.getIsbn())
             .bookName(saveBook.getBookName())
             .author(saveBook.getAuthor())
             .publisher(saveBook.getPublisher())
+            .description(saveBook.getDescription())
+            .imageUrl(saveBook.getImageUrl())
             .createDate(saveBook.getCreateDate())
             .updateDate(saveBook.getUpdateDate())
             .build();
@@ -60,10 +63,12 @@ public class BookService {
         Book saveBook;
         if (originBook.isEmpty()) {
             Book book = Book.builder()
+                .isbn(bookRequest.getIsbn())
                 .bookName(bookRequest.getBookName())
                 .author(bookRequest.getAuthor())
                 .publisher(bookRequest.getPublisher())
-                .isbn(bookRequest.getIsbn())
+                .description(bookRequest.getDescription())
+                .imageUrl(bookRequest.getImageUrl())
                 .build();
             saveBook = bookRepository.save(book);
         } else {
@@ -74,24 +79,28 @@ public class BookService {
 
     public void delete(Long id){
         Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
-        if(book.getReportList().isEmpty()){
-            bookRepository.delete(book);
-        }
+        bookRepository.delete(book);
     }
     @Transactional
     public BookDTO update(BookRequest bookRequest, Long id){
         Book book = findBookById(id);
+        book.setIsbn(bookRequest.getIsbn());
         book.setBookName(bookRequest.getBookName());
         book.setAuthor(bookRequest.getAuthor());
         book.setPublisher(bookRequest.getPublisher());
+        book.setDescription(bookRequest.getDescription());
+        book.setImageUrl(bookRequest.getImageUrl());
         return BookDTO.builder()
-                .id(book.getId())
-                .bookName(book.getBookName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .createDate(book.getCreateDate())
-                .updateDate(book.getUpdateDate())
-                .build();
+            .id(book.getId())
+            .isbn(book.getIsbn())
+            .bookName(book.getBookName())
+            .author(book.getAuthor())
+            .publisher(book.getPublisher())
+            .description(book.getDescription())
+            .imageUrl(book.getImageUrl())
+            .createDate(book.getCreateDate())
+            .updateDate(book.getUpdateDate())
+            .build();
 
     }
 
