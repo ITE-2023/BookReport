@@ -2,18 +2,21 @@ package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
 
+import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.domain.Report;
+import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
 import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.repository.BookRepository;
-import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
-    private final MemberRepository memberRepository;
     private final MyBookRepository myBookRepository;
     private final BookRepository bookRepository;
 
@@ -34,8 +36,7 @@ public class ReportService {
         if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
-
-        if (myBook.getReport().getId() != null) {
+        if (myBook.getReport() != null) {
             throw new ReportException(REPORT_EXIST);
         }
 
@@ -116,5 +117,24 @@ public class ReportService {
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
             .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+    }
+
+    /**
+     * 책별 독후감 리스트 페이징
+     */
+    public List<ReportDTO> getReportList(String isbn, Pageable pageable) {
+        Book book = bookRepository.findByIsbn(isbn)
+            .orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
+
+        return reportRepository.findAllByBook(book, pageable).stream().map(report ->
+            ReportDTO.builder()
+                .id(report.getId())
+                .title(report.getTitle())
+                .content(report.getContent())
+                .username(report.getMember().getUsername())
+                .createDate(report.getCreateDate())
+                .updateDate(report.getUpdateDate())
+                .build()
+        ).toList();
     }
 }
