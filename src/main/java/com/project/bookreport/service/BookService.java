@@ -2,6 +2,7 @@ package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
 import com.project.bookreport.domain.Book;
+import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
@@ -11,6 +12,7 @@ import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,7 +110,10 @@ public class BookService {
      */
     public void delete(Long id){
         Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
-        bookRepository.delete(book);
+        List<MyBook> myBooks = myBookRepository.findAllByBook(book);
+        if (myBooks.isEmpty()) {
+            bookRepository.delete(book);
+        }
     }
 
     /**

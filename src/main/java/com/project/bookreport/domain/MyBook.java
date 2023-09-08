@@ -34,6 +34,6 @@ public class MyBook extends BaseEntity {
   private LocalDateTime startDate;
   private LocalDateTime endDate;
 
-  @OneToOne(mappedBy = "myBook", cascade = CascadeType.REMOVE)
+  @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
   private Report report;
 }

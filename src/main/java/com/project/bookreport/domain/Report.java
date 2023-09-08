@@ -27,7 +27,4 @@ public class Report extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
-
-    @OneToOne
-    private MyBook myBook;
 }
