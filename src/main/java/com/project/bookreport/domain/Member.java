@@ -21,6 +21,7 @@ public class Member extends BaseEntity {
     @Column(length = 20, unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)

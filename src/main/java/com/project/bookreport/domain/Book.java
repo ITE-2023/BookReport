@@ -13,11 +13,18 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class Book extends BaseEntity {
-    @Column(length = 20, unique = true)
+    @Column(unique = true, nullable = false)
     private String isbn;
+
+    @Column(nullable = false)
     private String bookName;
+
+    @Column(nullable = false)
     private String author;
+
+    @Column(nullable = false)
     private String publisher;
+
     @Lob
     private String description;
     private String imageUrl;
