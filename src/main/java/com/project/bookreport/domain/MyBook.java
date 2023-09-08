@@ -1,9 +1,12 @@
 package com.project.bookreport.domain;
 
 import com.project.bookreport.domain.base.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,11 +21,19 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
-public class MemberBook extends BaseEntity {
+public class MyBook extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Book book;
+
+  private String myBookStatus;
+  private Integer rate;
+  private LocalDateTime startDate;
+  private LocalDateTime endDate;
+
+  @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+  private Report report;
 }

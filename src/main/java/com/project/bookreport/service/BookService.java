@@ -1,19 +1,14 @@
 package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
-import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
-
 import com.project.bookreport.domain.Book;
-import com.project.bookreport.domain.Member;
-import com.project.bookreport.domain.MemberBook;
+import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
-import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
-import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.repository.BookRepository;
-import com.project.bookreport.repository.MemberBookRepository;
+import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class BookService {
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
-    private final MemberBookRepository memberBookRepository;
+    private final MyBookRepository myBookRepository;
 
     @Value("${book.searchUrl}")
     private String BOOK_SEARCH_URL;
@@ -54,9 +49,12 @@ public class BookService {
         Book saveBook = getSaveBook(bookRequest);
         return BookDTO.builder()
             .id(saveBook.getId())
+            .isbn(saveBook.getIsbn())
             .bookName(saveBook.getBookName())
             .author(saveBook.getAuthor())
             .publisher(saveBook.getPublisher())
+            .description(saveBook.getDescription())
+            .imageUrl(saveBook.getImageUrl())
             .createDate(saveBook.getCreateDate())
             .updateDate(saveBook.getUpdateDate())
             .build();
@@ -67,10 +65,12 @@ public class BookService {
         Book saveBook;
         if (originBook.isEmpty()) {
             Book book = Book.builder()
+                .isbn(bookRequest.getIsbn())
                 .bookName(bookRequest.getBookName())
                 .author(bookRequest.getAuthor())
                 .publisher(bookRequest.getPublisher())
-                .isbn(bookRequest.getIsbn())
+                .description(bookRequest.getDescription())
+                .imageUrl(bookRequest.getImageUrl())
                 .build();
             saveBook = bookRepository.save(book);
         } else {
@@ -79,29 +79,46 @@ public class BookService {
         return saveBook;
     }
 
-    public void delete(Long id){
-        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
-        if(book.getReportList().isEmpty()){
-            bookRepository.delete(book);
-        }
-    }
+    /**
+     * 책 수정
+     */
     @Transactional
     public BookDTO update(BookRequest bookRequest, Long id){
         Book book = findBookById(id);
+        book.setIsbn(bookRequest.getIsbn());
         book.setBookName(bookRequest.getBookName());
         book.setAuthor(bookRequest.getAuthor());
         book.setPublisher(bookRequest.getPublisher());
+        book.setDescription(bookRequest.getDescription());
+        book.setImageUrl(bookRequest.getImageUrl());
         return BookDTO.builder()
-                .id(book.getId())
-                .bookName(book.getBookName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .createDate(book.getCreateDate())
-                .updateDate(book.getUpdateDate())
-                .build();
+            .id(book.getId())
+            .isbn(book.getIsbn())
+            .bookName(book.getBookName())
+            .author(book.getAuthor())
+            .publisher(book.getPublisher())
+            .description(book.getDescription())
+            .imageUrl(book.getImageUrl())
+            .createDate(book.getCreateDate())
+            .updateDate(book.getUpdateDate())
+            .build();
 
     }
 
+    /**
+     * 책 삭제
+     */
+    public void delete(Long id){
+        Book book = bookRepository.findById(id).orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
+        List<MyBook> myBooks = myBookRepository.findAllByBook(book);
+        if (myBooks.isEmpty()) {
+            bookRepository.delete(book);
+        }
+    }
+
+    /**
+     * 책 조회 (id)
+     */
     private Book findBookById(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(()-> new BookException(BOOK_NOT_FOUND));
@@ -137,62 +154,6 @@ public class BookService {
         } catch (Exception e) {
             throw new BookException(BOOK_SEARCH_FAIL);
         }
-    }
-
-    /**
-     * 내 서재에 추가
-     * - Book이 DB에 없다면 생성, 있다면 저장된 책 리턴
-     * - Member와 Book 연결
-     */
-    public void saveMyBook(MemberContext memberContext, BookRequest bookRequest) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        Book saveBook = getSaveBook(bookRequest);
-
-        if (memberBookRepository.findByMemberAndBook(member, saveBook).isPresent()) {
-            throw new BookException(MEMBER_BOOK_NOT_UNIQUE);
-        }
-
-        MemberBook memberBook = MemberBook.builder()
-            .book(saveBook)
-            .member(member)
-            .build();
-        memberBookRepository.save(memberBook);
-    }
-
-    /**
-     * 내 서재에서 삭제
-     */
-    public void deleteMyBook(MemberContext memberContext, String isbn) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        Book book = getBook(isbn).orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
-
-        MemberBook memberBook = memberBookRepository.findByMemberAndBook(member, book)
-            .orElseThrow(() -> new BookException(MEMBER_BOOK_NOT_FOUND));
-
-        memberBookRepository.delete(memberBook);
-    }
-
-    /**
-     * 회원별 책 조회
-     */
-    public List<BookDTO> findMyBooks(MemberContext memberContext) {
-        Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-        List<MemberBook> memberBooks = memberBookRepository.findAllByMember(member);
-        return memberBooks.stream().map(memberBook -> {
-            Book book = memberBook.getBook();
-            return BookDTO.builder()
-                .id(book.getId())
-                .isbn(book.getIsbn())
-                .bookName(book.getBookName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .createDate(book.getCreateDate())
-                .updateDate(book.getUpdateDate())
-                .build();
-        }).toList();
     }
 }
 

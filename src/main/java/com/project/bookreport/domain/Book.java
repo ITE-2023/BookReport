@@ -2,8 +2,6 @@ package com.project.bookreport.domain;
 
 import com.project.bookreport.domain.base.BaseEntity;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,15 +13,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class Book extends BaseEntity {
-    @Column(length = 20, unique = true)
+    @Column(unique = true, nullable = false)
     private String isbn;
+
+    @Column(nullable = false)
     private String bookName;
+
+    @Column(nullable = false)
     private String author;
+
+    @Column(nullable = false)
     private String publisher;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<Report> reportList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<MemberBook> memberList = new ArrayList<>();
+    @Lob
+    private String description;
+    private String imageUrl;
 }

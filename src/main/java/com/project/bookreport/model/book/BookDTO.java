@@ -13,6 +13,8 @@ public class BookDTO {
     private String bookName;
     private String author;
     private String publisher;
+    private String description;
+    private String imageUrl;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 }

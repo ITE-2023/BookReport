@@ -1,6 +1,7 @@
 package com.project.bookreport.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bookreport.exception.CustomAccessDeniedHandler;
 import com.project.bookreport.exception.CustomAuthenticationEntryPoint;
 import com.project.bookreport.security.jwt.JWTAuthorizationFilter;
 import com.project.bookreport.security.jwt.JwtProvider;
@@ -32,10 +33,15 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
     http
+        .exceptionHandling()
+        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper))
+        .accessDeniedHandler(new CustomAccessDeniedHandler(objectMapper))
+        .and()
         .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**").permitAll()
-            .requestMatchers("/book/create","/book/delete/**","/book/update/**").hasRole("ADMIN")
+            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**")
+            .permitAll()
+            .requestMatchers("/book/create", "/book/delete/**", "/book/update/**").hasRole("ADMIN")
             .anyRequest().authenticated())
         .cors().configurationSource(corsConfigurationSource()) // 타 도메인에서 API 접근 허용
         .and()
@@ -50,9 +56,8 @@ public class SecurityConfig {
         .addFilterBefore(
             new JWTAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(),
                 jwtProvider, memberService),
-            UsernamePasswordAuthenticationFilter.class)
-        .exceptionHandling()
-        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper));
+            UsernamePasswordAuthenticationFilter.class);
+
 
     return http.build();
   }

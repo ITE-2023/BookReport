@@ -21,10 +21,11 @@ public class Member extends BaseEntity {
     @Column(length = 20, unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<MemberBook> bookList = new ArrayList<>();
+    private List<MyBook> myBookList = new ArrayList<>();
 
     /*
     @ElementCollection : 컬렉션의 각 요소를 저장할 수 있다. 부모 Entity와 독립적으로 사용 X
