@@ -3,6 +3,7 @@ package com.project.bookreport.service;
 import static com.project.bookreport.exception.ErrorCode.*;
 
 import com.project.bookreport.domain.Book;
+import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.custom_exceptions.BookException;
@@ -30,29 +31,19 @@ public class ReportService {
     /**
      * 독후감 생성
      */
-    public ReportDTO create(MemberContext memberContext, Long myBookId, ReportRequest reportRequest) {
-        MyBook myBook = myBookRepository.findById(myBookId)
-            .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
-        if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
-            throw new ReportException(ACCESS_DENIED);
-        }
-        if (myBook.getReport() != null) {
-            throw new ReportException(REPORT_EXIST);
-        }
-
+    public ReportDTO create(Member member, Book book) {
         Report report = Report.builder()
-            .title(reportRequest.getTitle())
-            .content(reportRequest.getContent())
-            .member(myBook.getMember())
-            .book(myBook.getBook())
-            .myBook(myBook)
+            .title("")
+            .content("")
+            .member(member)
+            .book(book)
             .build();
         Report savedReport = reportRepository.save(report);
         return ReportDTO.builder()
             .id(savedReport.getId())
             .title(savedReport.getTitle())
             .content(savedReport.getContent())
-            .username(myBook.getMember().getUsername())
+            .username(member.getUsername())
             .createDate(savedReport.getCreateDate())
             .updateDate(savedReport.getUpdateDate())
             .build();
@@ -80,18 +71,6 @@ public class ReportService {
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
-    }
-
-    /**
-     * 독후감 삭제
-     */
-    public void delete(MemberContext memberContext, Long id){
-        Report report = findReportById(id);
-
-        if(!report.getMember().getUsername().equals(memberContext.getUsername())){
-            throw new ReportException(ACCESS_DENIED);
-        }
-        reportRepository.delete(report);
     }
 
     /**

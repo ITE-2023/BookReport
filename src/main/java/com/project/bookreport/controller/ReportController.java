@@ -3,9 +3,8 @@ package com.project.bookreport.controller;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import com.project.bookreport.model.member.MemberContext;
-import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.model.report.ReportDTO;
-import com.project.bookreport.service.BookService;
+import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,18 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
-    private final BookService bookService;
-
-    /**
-     * 독후감 생성
-     */
-    @PostMapping("/report/create/{id}")
-    public ResponseEntity<ReportDTO> create(@AuthenticationPrincipal MemberContext memberContext,
-        @PathVariable("id") Long myBookId,
-        @Valid @RequestBody ReportRequest reportRequest){
-        ReportDTO reportDTO = reportService.create(memberContext, myBookId, reportRequest);
-        return ResponseEntity.ok(reportDTO);
-    }
 
     /**
      * 독후감 수정
@@ -47,15 +34,6 @@ public class ReportController {
         @Valid @RequestBody ReportRequest reportRequest){
         ReportDTO reportDTO = reportService.update(memberContext, id, reportRequest);
         return ResponseEntity.ok(reportDTO);
-    }
-
-    /**
-     * 독후감 삭제
-     */
-    @DeleteMapping("/report/delete/{id}")
-    public ResponseEntity<Object> delete(@AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
-        reportService.delete(memberContext, id);
-        return ResponseEntity.ok().build();//완료한 값을 던짐
     }
 
     /**

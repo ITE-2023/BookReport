@@ -1,5 +1,6 @@
 package com.project.bookreport.service;
 
+import static com.project.bookreport.exception.ErrorCode.*;
 import static com.project.bookreport.exception.ErrorCode.ACCESS_DENIED;
 import static com.project.bookreport.exception.ErrorCode.BOOK_NOT_FOUND;
 import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
@@ -9,17 +10,21 @@ import static com.project.bookreport.exception.ErrorCode.MY_BOOK_NOT_UNIQUE;
 import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
+import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
+import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookRequest;
 import com.project.bookreport.model.myBook.MyBookResponse;
+import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
+import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +38,8 @@ public class MyBookService {
   private final MemberRepository memberRepository;
   private final BookRepository bookRepository;
   private final MyBookRepository myBookRepository;
+  private final ReportService reportService;
+  private final ReportRepository reportRepository;
 
   /**
    * 내 서재에 추가
@@ -48,10 +55,14 @@ public class MyBookService {
     if (myBookRepository.findByMemberAndBook(member, book).isPresent()) {
       throw new BookException(MY_BOOK_NOT_UNIQUE);
     }
+    ReportDTO reportDTO = reportService.create(member, book);
+    Report report = reportRepository.findById(reportDTO.getId())
+        .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
 
     MyBook myBook = MyBook.builder()
         .book(book)
         .member(member)
+        .report(report)
         .myBookStatus(myBookRequest.getMyBookStatus())
         .rate(myBookRequest.getRate())
         .startDate(myBookRequest.getStartDate())
