@@ -1,20 +1,25 @@
 package com.project.bookreport.service;
 
 import static com.project.bookreport.exception.ErrorCode.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.model.book.BookDTO;
+import com.project.bookreport.model.book.BookDetailDTO;
+import com.project.bookreport.model.book.BookDetailResponse;
+import com.project.bookreport.model.book.BookDetailResponse.Item;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MyBookRepository;
-import com.project.bookreport.repository.MemberRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -26,13 +31,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookService {
     private final BookRepository bookRepository;
-    private final MemberRepository memberRepository;
     private final MyBookRepository myBookRepository;
 
     @Value("${book.searchUrl}")
     private String BOOK_SEARCH_URL;
+
+    @Value("${book.detailUrl}")
+    private String BOOK_DETAIL_URL;
 
     @Value("${book.id}")
     private String ID;
@@ -152,6 +160,43 @@ public class BookService {
             return restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity, BookSearchDTO.class)
                 .getBody();
         } catch (Exception e) {
+            throw new BookException(BOOK_SEARCH_FAIL);
+        }
+    }
+
+    public BookDetailDTO detailSearch(String isbn) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        URI targetUrl = UriComponentsBuilder
+            .fromUriString(BOOK_DETAIL_URL)
+            .queryParam("d_isbn", isbn)
+            .queryParam("display", 1)
+            .build()
+            .encode(StandardCharsets.UTF_8)
+            .toUri();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Naver-Client-Id", ID);
+        headers.set("X-Naver-Client-Secret", SECRET);
+        HttpEntity<Object> httpEntity = new HttpEntity<>(headers);
+
+        try {
+            String xmlBody = restTemplate.exchange(targetUrl, HttpMethod.GET, httpEntity,
+                String.class).getBody();
+            ObjectMapper objectMapper = new XmlMapper();
+            BookDetailResponse bookDetailResponse = objectMapper.readValue(xmlBody,
+                BookDetailResponse.class);
+            Item item = bookDetailResponse.getChannel().getItems().get(0);
+            return BookDetailDTO.builder()
+                .title(item.getTitle())
+                .image(item.getImage())
+                .author(item.getAuthor())
+                .isbn(item.getIsbn())
+                .publisher(item.getPublisher())
+                .description(item.getDescription())
+                .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BookException(BOOK_SEARCH_FAIL);
         }
     }

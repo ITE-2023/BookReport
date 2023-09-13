@@ -39,7 +39,7 @@ public class SecurityConfig {
         .and()
         .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**")
+            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**" , "/book/detail/**")
             .permitAll()
             .requestMatchers("/book/create", "/book/delete/**", "/book/update/**").hasRole("ADMIN")
             .anyRequest().authenticated())
