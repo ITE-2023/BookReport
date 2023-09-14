@@ -26,6 +26,7 @@ import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -156,5 +157,17 @@ public class MyBookService {
               .myBookDTO(myBookDTO)
               .build();
         }).toList();
+  }
+
+  public Boolean checkMyBook(MemberContext memberContext, String isbn) {
+    Optional<Book> book = bookRepository.findByIsbn(isbn);
+    if (book.isEmpty()) {
+      return false;
+    }
+    Member member = memberRepository.findMemberById(memberContext.getId())
+        .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+    Optional<MyBook> myBook = myBookRepository.findByMemberAndBook(member, book.get());
+    return myBook.isPresent();
   }
 }

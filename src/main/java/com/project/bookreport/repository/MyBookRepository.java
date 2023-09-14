@@ -19,4 +19,5 @@ public interface MyBookRepository extends JpaRepository<MyBook, Long> {
   Page<MyBook> findAllByMember(Pageable pageable, @Param("member") Member member, @Param("year") int year);
 
   List<MyBook> findAllByBook(Book book);
+
 }

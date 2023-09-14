@@ -76,4 +76,14 @@ public class MyBookController {
     List<MyBookResponse> myBookResponses = myBookService.myBooks(memberContext, pageable, year);
     return ResponseEntity.ok(myBookResponses);
   }
+
+  /**
+   * 내 서재에 담긴 책인지 여부 확인
+   */
+  @GetMapping("/myBook/check/{isbn}")
+  public ResponseEntity<Boolean> checkMyBook(@AuthenticationPrincipal MemberContext memberContext,
+      @PathVariable("isbn") String isbn) {
+    Boolean b = myBookService.checkMyBook(memberContext, isbn);
+    return ResponseEntity.ok(b);
+  }
 }
