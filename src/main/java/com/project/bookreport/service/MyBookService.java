@@ -17,6 +17,7 @@ import com.project.bookreport.exception.custom_exceptions.MyBookException;
 import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
+import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookRequest;
 import com.project.bookreport.model.myBook.MyBookResponse;
@@ -159,15 +160,20 @@ public class MyBookService {
         }).toList();
   }
 
-  public Boolean checkMyBook(MemberContext memberContext, String isbn) {
+  public MyBookCheck checkMyBook(MemberContext memberContext, String isbn) {
+    boolean check = false;
+    Long id = null;
     Optional<Book> book = bookRepository.findByIsbn(isbn);
     if (book.isEmpty()) {
-      return false;
+      return MyBookCheck.builder().check(check).myBookId(id).build();
     }
     Member member = memberRepository.findMemberById(memberContext.getId())
         .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-
     Optional<MyBook> myBook = myBookRepository.findByMemberAndBook(member, book.get());
-    return myBook.isPresent();
+    if (myBook.isPresent()) {
+      check = true;
+      id = myBook.get().getId();
+    }
+    return MyBookCheck.builder().check(check).myBookId(id).build();
   }
 }
