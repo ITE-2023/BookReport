@@ -11,12 +11,14 @@ import com.project.bookreport.exception.custom_exceptions.MyBookException;
 import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
+import com.project.bookreport.model.report.ReportPagingResponse;
 import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,11 +103,13 @@ public class ReportService {
     /**
      * 책별 독후감 리스트 페이징
      */
-    public List<ReportDTO> getReportList(String isbn, Pageable pageable) {
+    public ReportPagingResponse getReportList(String isbn, Pageable pageable) {
         Book book = bookRepository.findByIsbn(isbn)
             .orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
 
-        return reportRepository.findAllByBook(book, pageable).stream().map(report ->
+        Page<Report> reports = reportRepository.findAllByBook(book, pageable);
+        int totalPage = reports.getTotalPages();
+        List<ReportDTO> reportDTOS = reports.stream().map(report ->
             ReportDTO.builder()
                 .id(report.getId())
                 .title(report.getTitle())
@@ -115,5 +119,6 @@ public class ReportService {
                 .updateDate(report.getUpdateDate())
                 .build()
         ).toList();
+        return ReportPagingResponse.builder().totalPage(totalPage).reportList(reportDTOS).build();
     }
 }

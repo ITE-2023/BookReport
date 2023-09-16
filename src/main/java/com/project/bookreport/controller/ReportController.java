@@ -4,10 +4,10 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.report.ReportDTO;
+import com.project.bookreport.model.report.ReportPagingResponse;
 import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.service.ReportService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -49,10 +49,10 @@ public class ReportController {
      * 책별 독후감 조회
      */
     @GetMapping("/reports/{isbn}")
-    public ResponseEntity<List<ReportDTO>> getReportList(@PathVariable("isbn") String isbn,
+    public ResponseEntity<ReportPagingResponse> getReportList(@PathVariable("isbn") String isbn,
         @PageableDefault(sort = "id", direction = DESC, size = 10)
         Pageable pageable) {
-        List<ReportDTO> reportList = reportService.getReportList(isbn, pageable);
+        ReportPagingResponse reportList = reportService.getReportList(isbn, pageable);
         return ResponseEntity.ok(reportList);
     }
 }
