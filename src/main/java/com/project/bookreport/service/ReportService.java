@@ -7,6 +7,7 @@ import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.custom_exceptions.BookException;
+import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
 import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.member.MemberContext;
@@ -14,6 +15,7 @@ import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.model.report.ReportPagingResponse;
 import com.project.bookreport.model.report.ReportRequest;
 import com.project.bookreport.repository.BookRepository;
+import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
@@ -29,14 +31,21 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final MyBookRepository myBookRepository;
     private final BookRepository bookRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * 독후감 생성
      */
-    public ReportDTO create(Member member, Book book) {
+    public ReportDTO create(MemberContext memberContext, Long myBookId,
+        ReportRequest reportRequest) {
+        MyBook myBook = myBookRepository.findById(myBookId)
+            .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+        Book book = myBook.getBook();
+        Member member = memberRepository.findMemberById(memberContext.getId())
+            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
         Report report = Report.builder()
-            .title("")
-            .content("")
+            .title(reportRequest.getTitle())
+            .content(reportRequest.getContent())
             .member(member)
             .book(book)
             .build();

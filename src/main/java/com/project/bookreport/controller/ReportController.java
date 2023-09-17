@@ -25,6 +25,16 @@ public class ReportController {
     private final ReportService reportService;
 
     /**
+     * 독후감 생성
+     */
+    @PostMapping("/report/create/{id}")
+    public ResponseEntity<ReportDTO> create(@AuthenticationPrincipal MemberContext memberContext,
+        @PathVariable("id") Long myBookId, @Valid @RequestBody ReportRequest reportRequest) {
+        ReportDTO reportDTO = reportService.create(memberContext, myBookId, reportRequest);
+        return ResponseEntity.ok(reportDTO);
+    }
+
+    /**
      * 독후감 수정
      */
     @PatchMapping("/report/update/{id}")
