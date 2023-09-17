@@ -4,6 +4,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
+import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookRequest;
 import com.project.bookreport.model.myBook.MyBookResponse;
@@ -75,5 +76,15 @@ public class MyBookController {
       Pageable pageable, @RequestParam("year") Integer year) {
     List<MyBookResponse> myBookResponses = myBookService.myBooks(memberContext, pageable, year);
     return ResponseEntity.ok(myBookResponses);
+  }
+
+  /**
+   * 내 서재에 담긴 책인지 여부 확인
+   */
+  @GetMapping("/myBook/check/{isbn}")
+  public ResponseEntity<MyBookCheck> checkMyBook(@AuthenticationPrincipal MemberContext memberContext,
+      @PathVariable("isbn") String isbn) {
+    MyBookCheck myBookCheck = myBookService.checkMyBook(memberContext, isbn);
+    return ResponseEntity.ok(myBookCheck);
   }
 }

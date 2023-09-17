@@ -1,6 +1,7 @@
 package com.project.bookreport.controller;
 
 import com.project.bookreport.model.book.BookDTO;
+import com.project.bookreport.model.book.BookDetailDTO;
 import com.project.bookreport.model.book.BookRequest;
 import com.project.bookreport.model.book.BookSearchDTO;
 import com.project.bookreport.service.BookService;
@@ -54,5 +55,14 @@ public class BookController {
   public ResponseEntity<BookSearchDTO> search(@RequestParam("query") String keyword) {
     BookSearchDTO bookSearchDTO = bookService.search(keyword);
     return ResponseEntity.ok(bookSearchDTO);
+  }
+
+  /**
+   * 책 상세 검색
+   */
+  @GetMapping("/book/detail/{isbn}")
+  public ResponseEntity<BookDetailDTO> detailSearch(@PathVariable("isbn") String isbn) {
+    BookDetailDTO bookDetailDTO = bookService.detailSearch(isbn);
+    return ResponseEntity.ok(bookDetailDTO);
   }
 }

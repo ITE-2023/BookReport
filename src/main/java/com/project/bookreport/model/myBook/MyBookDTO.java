@@ -12,6 +12,9 @@ public class MyBookDTO {
   private Integer rate;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
+  private Integer readPage;
+  private LocalDateTime readingStartDate;
+  private String expectation;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
 }

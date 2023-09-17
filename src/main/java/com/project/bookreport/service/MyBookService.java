@@ -1,6 +1,5 @@
 package com.project.bookreport.service;
 
-import static com.project.bookreport.exception.ErrorCode.*;
 import static com.project.bookreport.exception.ErrorCode.ACCESS_DENIED;
 import static com.project.bookreport.exception.ErrorCode.BOOK_NOT_FOUND;
 import static com.project.bookreport.exception.ErrorCode.MEMBER_NOT_FOUND;
@@ -10,22 +9,21 @@ import static com.project.bookreport.exception.ErrorCode.MY_BOOK_NOT_UNIQUE;
 import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
-import com.project.bookreport.domain.Report;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
-import com.project.bookreport.exception.custom_exceptions.ReportException;
 import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
+import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookRequest;
 import com.project.bookreport.model.myBook.MyBookResponse;
-import com.project.bookreport.model.report.ReportDTO;
 import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.MemberRepository;
 import com.project.bookreport.repository.MyBookRepository;
 import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,18 +53,18 @@ public class MyBookService {
     if (myBookRepository.findByMemberAndBook(member, book).isPresent()) {
       throw new BookException(MY_BOOK_NOT_UNIQUE);
     }
-    ReportDTO reportDTO = reportService.create(member, book);
-    Report report = reportRepository.findById(reportDTO.getId())
-        .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
 
     MyBook myBook = MyBook.builder()
         .book(book)
         .member(member)
-        .report(report)
+        .report(null)
         .myBookStatus(myBookRequest.getMyBookStatus())
         .rate(myBookRequest.getRate())
         .startDate(myBookRequest.getStartDate())
         .endDate(myBookRequest.getEndDate())
+        .readPage(myBookRequest.getReadPage())
+        .readingStartDate(myBookRequest.getReadingStartDate())
+        .expectation(myBookRequest.getExpectation())
         .build();
     MyBook saveMyBook = myBookRepository.save(myBook);
     return MyBookDTO.builder()
@@ -75,6 +73,9 @@ public class MyBookService {
         .rate(saveMyBook.getRate())
         .startDate(saveMyBook.getStartDate())
         .endDate(saveMyBook.getEndDate())
+        .readPage(saveMyBook.getReadPage())
+        .readingStartDate(saveMyBook.getReadingStartDate())
+        .expectation(saveMyBook.getExpectation())
         .createDate(saveMyBook.getCreateDate())
         .updateDate(saveMyBook.getUpdateDate())
         .build();
@@ -96,6 +97,9 @@ public class MyBookService {
     myBook.setRate(myBookRequest.getRate());
     myBook.setStartDate(myBookRequest.getStartDate());
     myBook.setEndDate(myBookRequest.getEndDate());
+    myBook.setReadPage(myBookRequest.getReadPage());
+    myBook.setReadingStartDate(myBookRequest.getReadingStartDate());
+    myBook.setExpectation(myBookRequest.getExpectation());
     return MyBookDTO.builder()
         .id(myBook.getId())
         .myBookStatus(myBook.getMyBookStatus())
@@ -104,6 +108,9 @@ public class MyBookService {
         .endDate(myBook.getEndDate())
         .createDate(myBook.getCreateDate())
         .updateDate(myBook.getUpdateDate())
+        .readPage(myBook.getReadPage())
+        .readingStartDate(myBook.getReadingStartDate())
+        .expectation(myBook.getExpectation())
         .build();
   }
 
@@ -147,6 +154,9 @@ public class MyBookService {
               .rate(myBook.getRate())
               .startDate(myBook.getStartDate())
               .endDate(myBook.getEndDate())
+              .readPage(myBook.getReadPage())
+              .readingStartDate(myBook.getReadingStartDate())
+              .expectation(myBook.getExpectation())
               .createDate(myBook.getCreateDate())
               .updateDate(myBook.getUpdateDate())
               .build();
@@ -156,5 +166,22 @@ public class MyBookService {
               .myBookDTO(myBookDTO)
               .build();
         }).toList();
+  }
+
+  public MyBookCheck checkMyBook(MemberContext memberContext, String isbn) {
+    boolean check = false;
+    Long id = null;
+    Optional<Book> book = bookRepository.findByIsbn(isbn);
+    if (book.isEmpty()) {
+      return MyBookCheck.builder().check(check).myBookId(id).build();
+    }
+    Member member = memberRepository.findMemberById(memberContext.getId())
+        .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+    Optional<MyBook> myBook = myBookRepository.findByMemberAndBook(member, book.get());
+    if (myBook.isPresent()) {
+      check = true;
+      id = myBook.get().getId();
+    }
+    return MyBookCheck.builder().check(check).myBookId(id).build();
   }
 }

@@ -6,6 +6,7 @@ import com.project.bookreport.exception.CustomAuthenticationEntryPoint;
 import com.project.bookreport.security.jwt.JWTAuthorizationFilter;
 import com.project.bookreport.security.jwt.JwtProvider;
 import com.project.bookreport.service.MemberService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity // 스프링 시큐리티 사용을 위한 어노테이션
@@ -38,8 +40,9 @@ public class SecurityConfig {
         .accessDeniedHandler(new CustomAccessDeniedHandler(objectMapper))
         .and()
         .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+            .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**")
+            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**" , "/book/detail/**", "/reports/**")
             .permitAll()
             .requestMatchers("/book/create", "/book/delete/**", "/book/update/**").hasRole("ADMIN")
             .anyRequest().authenticated())
@@ -68,6 +71,8 @@ public class SecurityConfig {
     configuration.addAllowedMethod("*");
     configuration.addAllowedHeader("*");
     configuration.addAllowedOrigin("http://localhost:3000");
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
