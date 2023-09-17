@@ -34,6 +34,10 @@ public class MyBook extends BaseEntity {
   private LocalDateTime startDate;
   private LocalDateTime endDate;
 
+  private Integer readPage;
+  private LocalDateTime readingStartDate;
+  private String expectation;
+
   @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
   private Report report;
 }

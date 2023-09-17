@@ -11,4 +11,7 @@ public class MyBookRequest {
   private Integer rate;
   private LocalDateTime startDate;
   private LocalDateTime endDate;
+  private Integer readPage;
+  private LocalDateTime readingStartDate;
+  private String expectation;
 }

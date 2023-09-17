@@ -69,6 +69,9 @@ public class MyBookService {
         .rate(myBookRequest.getRate())
         .startDate(myBookRequest.getStartDate())
         .endDate(myBookRequest.getEndDate())
+        .readPage(myBookRequest.getReadPage())
+        .readingStartDate(myBookRequest.getReadingStartDate())
+        .expectation(myBookRequest.getExpectation())
         .build();
     MyBook saveMyBook = myBookRepository.save(myBook);
     return MyBookDTO.builder()
@@ -77,6 +80,9 @@ public class MyBookService {
         .rate(saveMyBook.getRate())
         .startDate(saveMyBook.getStartDate())
         .endDate(saveMyBook.getEndDate())
+        .readPage(saveMyBook.getReadPage())
+        .readingStartDate(saveMyBook.getReadingStartDate())
+        .expectation(saveMyBook.getExpectation())
         .createDate(saveMyBook.getCreateDate())
         .updateDate(saveMyBook.getUpdateDate())
         .build();
@@ -98,6 +104,9 @@ public class MyBookService {
     myBook.setRate(myBookRequest.getRate());
     myBook.setStartDate(myBookRequest.getStartDate());
     myBook.setEndDate(myBookRequest.getEndDate());
+    myBook.setReadPage(myBookRequest.getReadPage());
+    myBook.setReadingStartDate(myBookRequest.getReadingStartDate());
+    myBook.setExpectation(myBookRequest.getExpectation());
     return MyBookDTO.builder()
         .id(myBook.getId())
         .myBookStatus(myBook.getMyBookStatus())
@@ -106,6 +115,9 @@ public class MyBookService {
         .endDate(myBook.getEndDate())
         .createDate(myBook.getCreateDate())
         .updateDate(myBook.getUpdateDate())
+        .readPage(myBook.getReadPage())
+        .readingStartDate(myBook.getReadingStartDate())
+        .expectation(myBook.getExpectation())
         .build();
   }
 
@@ -149,6 +161,9 @@ public class MyBookService {
               .rate(myBook.getRate())
               .startDate(myBook.getStartDate())
               .endDate(myBook.getEndDate())
+              .readPage(myBook.getReadPage())
+              .readingStartDate(myBook.getReadingStartDate())
+              .expectation(myBook.getExpectation())
               .createDate(myBook.getCreateDate())
               .updateDate(myBook.getUpdateDate())
               .build();
