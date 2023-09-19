@@ -6,13 +6,12 @@ import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
+import com.project.bookreport.model.myBook.MyBookPagingResponse;
 import com.project.bookreport.model.myBook.MyBookRequest;
-import com.project.bookreport.model.myBook.MyBookResponse;
 import com.project.bookreport.model.myBook.MyBookVO;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.MyBookService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -70,12 +69,13 @@ public class MyBookController {
    * 내 서재에 담긴 책 리스트 조회
    */
   @GetMapping("/myBooks")
-  public ResponseEntity<List<MyBookResponse>> myBooks(
+  public ResponseEntity<MyBookPagingResponse> myBooks(
       @AuthenticationPrincipal MemberContext memberContext,
       @PageableDefault(sort = "id", direction = DESC, size = 10)
       Pageable pageable, @RequestParam("year") Integer year) {
-    List<MyBookResponse> myBookResponses = myBookService.myBooks(memberContext, pageable, year);
-    return ResponseEntity.ok(myBookResponses);
+    MyBookPagingResponse myBooks = myBookService.myBooks(memberContext, pageable,
+        year);
+    return ResponseEntity.ok(myBooks);
   }
 
   /**
