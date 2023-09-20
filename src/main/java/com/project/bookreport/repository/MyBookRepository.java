@@ -15,7 +15,11 @@ public interface MyBookRepository extends JpaRepository<MyBook, Long> {
 
   Optional<MyBook> findByMemberAndBook(Member member, Book book);
 
-  @Query("select m from MyBook m where YEAR(m.startDate) = :year and m.member = :member")
+
+  @Query("SELECT m FROM MyBook m " +
+      "WHERE (YEAR(m.startDate) = :year OR YEAR(m.readingStartDate) = :year " +
+      "       OR (m.myBookStatus = '읽고 싶은 책' AND YEAR(m.updateDate) = :year)) " +
+      "AND m.member = :member")
   Page<MyBook> findAllByMember(Pageable pageable, @Param("member") Member member, @Param("year") int year);
 
   List<MyBook> findAllByBook(Book book);

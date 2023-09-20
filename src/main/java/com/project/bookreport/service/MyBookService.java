@@ -16,6 +16,7 @@ import com.project.bookreport.model.book.BookDTO;
 import com.project.bookreport.model.member.MemberContext;
 import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
+import com.project.bookreport.model.myBook.MyBookPagingResponse;
 import com.project.bookreport.model.myBook.MyBookRequest;
 import com.project.bookreport.model.myBook.MyBookResponse;
 import com.project.bookreport.repository.BookRepository;
@@ -25,6 +26,7 @@ import com.project.bookreport.repository.ReportRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +54,23 @@ public class MyBookService {
 
     if (myBookRepository.findByMemberAndBook(member, book).isPresent()) {
       throw new BookException(MY_BOOK_NOT_UNIQUE);
+    }
+
+    if (myBookRequest.getMyBookStatus().equals("읽은 책")) {
+      myBookRequest.setReadPage(null);
+      myBookRequest.setReadingStartDate(null);
+      myBookRequest.setExpectation(null);
+    } else if (myBookRequest.getMyBookStatus().equals("읽는 중인 책")) {
+      myBookRequest.setRate(null);
+      myBookRequest.setStartDate(null);
+      myBookRequest.setEndDate(null);
+      myBookRequest.setExpectation(null);
+    } else {
+      myBookRequest.setRate(null);
+      myBookRequest.setStartDate(null);
+      myBookRequest.setEndDate(null);
+      myBookRequest.setReadPage(null);
+      myBookRequest.setReadingStartDate(null);
     }
 
     MyBook myBook = MyBook.builder()
@@ -131,11 +150,12 @@ public class MyBookService {
   /**
    * 내 서재 속 책 리스트 조회
    */
-  public List<MyBookResponse> myBooks(MemberContext memberContext, Pageable pageable, Integer year) {
+  public MyBookPagingResponse myBooks(MemberContext memberContext, Pageable pageable, Integer year) {
     Member member = memberRepository.findMemberById(memberContext.getId())
         .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
-
-    return myBookRepository.findAllByMember(pageable, member, year).stream()
+    Page<MyBook> myBooks = myBookRepository.findAllByMember(pageable, member, year);
+    int totalPage = myBooks.getTotalPages();
+    List<MyBookResponse> myBookResponses = myBooks.stream()
         .map(myBook -> {
           Book book = myBook.getBook();
           BookDTO bookDto = BookDTO.builder()
@@ -144,6 +164,7 @@ public class MyBookService {
               .bookName(book.getBookName())
               .author(book.getAuthor())
               .publisher(book.getPublisher())
+              .imageUrl(book.getImageUrl())
               .createDate(book.getCreateDate())
               .updateDate(book.getUpdateDate())
               .build();
@@ -166,6 +187,10 @@ public class MyBookService {
               .myBookDTO(myBookDTO)
               .build();
         }).toList();
+    return MyBookPagingResponse.builder()
+        .totalPage(totalPage)
+        .myBooks(myBookResponses)
+        .build();
   }
 
   public MyBookCheck checkMyBook(MemberContext memberContext, String isbn) {
