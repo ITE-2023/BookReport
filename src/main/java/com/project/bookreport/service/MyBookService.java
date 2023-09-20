@@ -56,6 +56,23 @@ public class MyBookService {
       throw new BookException(MY_BOOK_NOT_UNIQUE);
     }
 
+    if (myBookRequest.getMyBookStatus().equals("읽은 책")) {
+      myBookRequest.setReadPage(null);
+      myBookRequest.setReadingStartDate(null);
+      myBookRequest.setExpectation(null);
+    } else if (myBookRequest.getMyBookStatus().equals("읽는 중인 책")) {
+      myBookRequest.setRate(null);
+      myBookRequest.setStartDate(null);
+      myBookRequest.setEndDate(null);
+      myBookRequest.setExpectation(null);
+    } else {
+      myBookRequest.setRate(null);
+      myBookRequest.setStartDate(null);
+      myBookRequest.setEndDate(null);
+      myBookRequest.setReadPage(null);
+      myBookRequest.setReadingStartDate(null);
+    }
+
     MyBook myBook = MyBook.builder()
         .book(book)
         .member(member)
@@ -147,6 +164,7 @@ public class MyBookService {
               .bookName(book.getBookName())
               .author(book.getAuthor())
               .publisher(book.getPublisher())
+              .imageUrl(book.getImageUrl())
               .createDate(book.getCreateDate())
               .updateDate(book.getUpdateDate())
               .build();
