@@ -24,4 +24,5 @@ public interface MyBookRepository extends JpaRepository<MyBook, Long> {
 
   List<MyBook> findAllByBook(Book book);
 
+
 }

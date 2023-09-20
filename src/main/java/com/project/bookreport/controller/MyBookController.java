@@ -8,6 +8,7 @@ import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookPagingResponse;
 import com.project.bookreport.model.myBook.MyBookRequest;
+import com.project.bookreport.model.myBook.MyBookResponse;
 import com.project.bookreport.model.myBook.MyBookVO;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.MyBookService;
@@ -86,5 +87,15 @@ public class MyBookController {
       @PathVariable("isbn") String isbn) {
     MyBookCheck myBookCheck = myBookService.checkMyBook(memberContext, isbn);
     return ResponseEntity.ok(myBookCheck);
+  }
+
+  /**
+   * 내 서재 속 책 단 건 조회
+   */
+  @GetMapping("/myBook/detail/{id}")
+  public ResponseEntity<MyBookResponse> findMyBook(
+      @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
+    MyBookResponse myBook = myBookService.findMyBook(memberContext, id);
+    return ResponseEntity.ok(myBook);
   }
 }
