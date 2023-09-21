@@ -36,20 +36,25 @@ public class ReportService {
     /**
      * 독후감 생성
      */
+    @Transactional
     public ReportDTO create(MemberContext memberContext, Long myBookId,
         ReportRequest reportRequest) {
         MyBook myBook = myBookRepository.findById(myBookId)
             .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+        if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
+            throw new ReportException(ACCESS_DENIED);
+        }
         Book book = myBook.getBook();
         Member member = memberRepository.findMemberById(memberContext.getId())
             .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
         Report report = Report.builder()
             .title(reportRequest.getTitle())
             .content(reportRequest.getContent())
-            .member(member)
+            .username(member.getUsername())
             .book(book)
             .build();
         Report savedReport = reportRepository.save(report);
+        myBook.setReport(report);
         return ReportDTO.builder()
             .id(savedReport.getId())
             .title(savedReport.getTitle())
@@ -67,7 +72,7 @@ public class ReportService {
     public ReportDTO update(MemberContext memberContext, Long id, ReportRequest reportRequest) {
 
         Report report = findReportById(id);
-        if (!report.getMember().getUsername().equals(memberContext.getUsername())) {
+        if (!report.getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
 
@@ -78,7 +83,7 @@ public class ReportService {
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
-            .username(report.getMember().getUsername())
+            .username(report.getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
@@ -95,7 +100,7 @@ public class ReportService {
             .id(report.getId())
             .title(report.getTitle())
             .content(report.getContent())
-            .username(report.getMember().getUsername())
+            .username(report.getUsername())
             .createDate(report.getCreateDate())
             .updateDate(report.getUpdateDate())
             .build();
@@ -123,7 +128,7 @@ public class ReportService {
                 .id(report.getId())
                 .title(report.getTitle())
                 .content(report.getContent())
-                .username(report.getMember().getUsername())
+                .username(report.getUsername())
                 .createDate(report.getCreateDate())
                 .updateDate(report.getUpdateDate())
                 .build()

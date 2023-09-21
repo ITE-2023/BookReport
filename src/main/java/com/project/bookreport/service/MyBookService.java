@@ -165,6 +165,7 @@ public class MyBookService {
               .author(book.getAuthor())
               .publisher(book.getPublisher())
               .imageUrl(book.getImageUrl())
+              .description(book.getDescription())
               .createDate(book.getCreateDate())
               .updateDate(book.getUpdateDate())
               .build();
@@ -208,5 +209,44 @@ public class MyBookService {
       id = myBook.get().getId();
     }
     return MyBookCheck.builder().check(check).myBookId(id).build();
+  }
+
+  public MyBookResponse findMyBook(MemberContext memberContext, Long id) {
+    MyBook myBook = myBookRepository.findById(id)
+        .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+
+    if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
+      throw new MyBookException(ACCESS_DENIED);
+    }
+
+    Book book = myBook.getBook();
+    BookDTO bookDto = BookDTO.builder()
+        .id(book.getId())
+        .isbn(book.getIsbn())
+        .bookName(book.getBookName())
+        .author(book.getAuthor())
+        .publisher(book.getPublisher())
+        .imageUrl(book.getImageUrl())
+        .description(book.getDescription())
+        .createDate(book.getCreateDate())
+        .updateDate(book.getUpdateDate())
+        .build();
+    MyBookDTO myBookDTO = MyBookDTO.builder()
+        .id(myBook.getId())
+        .myBookStatus(myBook.getMyBookStatus())
+        .rate(myBook.getRate())
+        .startDate(myBook.getStartDate())
+        .endDate(myBook.getEndDate())
+        .readPage(myBook.getReadPage())
+        .readingStartDate(myBook.getReadingStartDate())
+        .expectation(myBook.getExpectation())
+        .createDate(myBook.getCreateDate())
+        .updateDate(myBook.getUpdateDate())
+        .build();
+
+    return MyBookResponse.builder()
+        .bookDTO(bookDto)
+        .myBookDTO(myBookDTO)
+        .build();
   }
 }

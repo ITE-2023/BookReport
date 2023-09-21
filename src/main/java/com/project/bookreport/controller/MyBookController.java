@@ -8,6 +8,7 @@ import com.project.bookreport.model.myBook.MyBookCheck;
 import com.project.bookreport.model.myBook.MyBookDTO;
 import com.project.bookreport.model.myBook.MyBookPagingResponse;
 import com.project.bookreport.model.myBook.MyBookRequest;
+import com.project.bookreport.model.myBook.MyBookResponse;
 import com.project.bookreport.model.myBook.MyBookVO;
 import com.project.bookreport.service.BookService;
 import com.project.bookreport.service.MyBookService;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +49,7 @@ public class MyBookController {
   /**
    * 내 서재 속 책 상태 수정
    */
-  @PostMapping("/myBook/update/{id}")
+  @PatchMapping("/myBook/update/{id}")
   public ResponseEntity<MyBookDTO> updateMyBook(
       @AuthenticationPrincipal MemberContext memberContext,
       @PathVariable("id") Long id, @Valid @RequestBody MyBookRequest myBookRequest) {
@@ -86,5 +88,15 @@ public class MyBookController {
       @PathVariable("isbn") String isbn) {
     MyBookCheck myBookCheck = myBookService.checkMyBook(memberContext, isbn);
     return ResponseEntity.ok(myBookCheck);
+  }
+
+  /**
+   * 내 서재 속 책 단 건 조회
+   */
+  @GetMapping("/myBook/detail/{id}")
+  public ResponseEntity<MyBookResponse> findMyBook(
+      @AuthenticationPrincipal MemberContext memberContext, @PathVariable("id") Long id) {
+    MyBookResponse myBook = myBookService.findMyBook(memberContext, id);
+    return ResponseEntity.ok(myBook);
   }
 }
