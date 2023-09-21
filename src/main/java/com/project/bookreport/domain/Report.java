@@ -20,9 +20,8 @@ public class Report extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private  String content;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    @Column(nullable = false)
+    private String username;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
