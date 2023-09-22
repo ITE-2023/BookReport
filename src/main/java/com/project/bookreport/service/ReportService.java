@@ -99,6 +99,10 @@ public class ReportService {
             throw new ReportException(ACCESS_DENIED);
         }
         Report report = myBook.getReport();
+
+        if (report == null) {
+            return null;
+        }
         return ReportDTO.builder()
             .id(report.getId())
             .title(report.getTitle())
