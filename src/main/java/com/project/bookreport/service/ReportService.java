@@ -138,4 +138,18 @@ public class ReportService {
         ).toList();
         return ReportPagingResponse.builder().totalPage(totalPage).reportList(reportDTOS).build();
     }
+
+    public ReportDTO getReportById(Long id) {
+        Report report = reportRepository.findById(id)
+            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+
+        return ReportDTO.builder()
+            .id(report.getId())
+            .title(report.getTitle())
+            .content(report.getContent())
+            .username(report.getUsername())
+            .createDate(report.getCreateDate())
+            .updateDate(report.getUpdateDate())
+            .build();
+    }
 }

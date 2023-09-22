@@ -57,6 +57,15 @@ public class ReportController {
     }
 
     /**
+     * 독후감 단 건 조회
+     */
+    @GetMapping("/report/detail/{id}")
+    public ResponseEntity<ReportDTO> getReportById(@PathVariable("id") Long id) {
+        ReportDTO reportById = reportService.getReportById(id);
+        return ResponseEntity.ok(reportById);
+    }
+
+    /**
      * 책별 독후감 조회
      */
     @GetMapping("/reports/{isbn}")
