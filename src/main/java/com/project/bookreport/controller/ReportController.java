@@ -47,11 +47,12 @@ public class ReportController {
     }
 
     /**
-     * 독후감 조회
+     * 내 서재로 독후감 조회
      */
-    @GetMapping("/report/detail/{id}")
-    public ResponseEntity<ReportDTO> getReport(@PathVariable("id") Long myBookId) {
-        ReportDTO reportDTO = reportService.getReport(myBookId);
+    @GetMapping("/report/detail")
+    public ResponseEntity<ReportDTO> getReport(@AuthenticationPrincipal MemberContext memberContext,
+        @RequestParam("myBook") Long myBookId) {
+        ReportDTO reportDTO = reportService.getReport(memberContext, myBookId);
         return ResponseEntity.ok(reportDTO);
     }
 

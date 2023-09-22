@@ -92,9 +92,12 @@ public class ReportService {
     /**
      * 독후감 단건 조회
      */
-    public ReportDTO getReport(Long myBookId) {
+    public ReportDTO getReport(MemberContext memberContext, Long myBookId) {
         MyBook myBook = myBookRepository.findById(myBookId)
             .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+        if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
+            throw new ReportException(ACCESS_DENIED);
+        }
         Report report = myBook.getReport();
         return ReportDTO.builder()
             .id(report.getId())
