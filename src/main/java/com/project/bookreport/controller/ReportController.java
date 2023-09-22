@@ -47,12 +47,22 @@ public class ReportController {
     }
 
     /**
-     * 독후감 조회
+     * 내 서재로 독후감 조회
+     */
+    @GetMapping("/report/detail")
+    public ResponseEntity<ReportDTO> getReport(@AuthenticationPrincipal MemberContext memberContext,
+        @RequestParam("myBook") Long myBookId) {
+        ReportDTO reportDTO = reportService.getReport(memberContext, myBookId);
+        return ResponseEntity.ok(reportDTO);
+    }
+
+    /**
+     * 독후감 단 건 조회
      */
     @GetMapping("/report/detail/{id}")
-    public ResponseEntity<ReportDTO> getReport(@PathVariable("id") Long myBookId) {
-        ReportDTO reportDTO = reportService.getReport(myBookId);
-        return ResponseEntity.ok(reportDTO);
+    public ResponseEntity<ReportDTO> getReportById(@PathVariable("id") Long id) {
+        ReportDTO reportById = reportService.getReportById(id);
+        return ResponseEntity.ok(reportById);
     }
 
     /**
