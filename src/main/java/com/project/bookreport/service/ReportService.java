@@ -64,7 +64,7 @@ public class ReportService {
                 .title(savedReport.getTitle())
                 .content(savedReport.getContent())
                 .username(member.getUsername())
-                .emotion(savedReport.getEmotionType().getMsg())
+                .emotionType(report.getEmotionType())
                 .createDate(savedReport.getCreateDate())
                 .updateDate(savedReport.getUpdateDate())
                 .build();
@@ -83,12 +83,15 @@ public class ReportService {
 
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
+        EmotionType emotionType = emotionService.update(reportRequest.getContent(), report.getBook());
+        report.setEmotionType(emotionType);
         reportRepository.save(report);
         return ReportDTO.builder()
                 .id(report.getId())
                 .title(report.getTitle())
                 .content(report.getContent())
                 .username(report.getUsername())
+                .emotionType(report.getEmotionType())
                 .createDate(report.getCreateDate())
                 .updateDate(report.getUpdateDate())
                 .build();
@@ -113,6 +116,7 @@ public class ReportService {
                 .title(report.getTitle())
                 .content(report.getContent())
                 .username(report.getUsername())
+                .emotionType(report.getEmotionType())
                 .createDate(report.getCreateDate())
                 .updateDate(report.getUpdateDate())
                 .build();
@@ -141,6 +145,7 @@ public class ReportService {
                         .title(report.getTitle())
                         .content(report.getContent())
                         .username(report.getUsername())
+                        .emotionType(report.getEmotionType())
                         .createDate(report.getCreateDate())
                         .updateDate(report.getUpdateDate())
                         .build()
@@ -157,6 +162,7 @@ public class ReportService {
                 .title(report.getTitle())
                 .content(report.getContent())
                 .username(report.getUsername())
+                .emotionType(report.getEmotionType())
                 .createDate(report.getCreateDate())
                 .updateDate(report.getUpdateDate())
                 .build();
