@@ -4,6 +4,7 @@ import static com.project.bookreport.exception.ErrorCode.MUSIC_NOT_RECOMMEND;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bookreport.domain.status.EmotionType;
 import com.project.bookreport.exception.custom_exceptions.MusicException;
 import com.project.bookreport.model.music.MusicRequest;
 import com.project.bookreport.model.music.MusicResponse;
@@ -27,8 +28,12 @@ public class MusicService {
     public MusicResponse recommend(Long id) {
 
         ReportDTO report = reportService.getReportById(id);
-        String content = report.getContent();
-        MusicRequest request = MusicRequest.builder().content(content).build();
+        EmotionType emotionType = report.getEmotionType();
+        if (emotionType == null) {
+            throw new MusicException(MUSIC_NOT_RECOMMEND);
+        }
+
+        MusicRequest request = MusicRequest.builder().emotion(emotionType.getMsg()).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent;
         try {
@@ -39,7 +44,7 @@ public class MusicService {
 
         RestTemplate restTemplate = new RestTemplate();
         URI targetUrl = UriComponentsBuilder
-                .fromUriString("http://localhost:5000/sentiment")
+                .fromUriString("http://localhost:5000/music")
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();

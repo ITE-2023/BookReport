@@ -6,5 +6,5 @@ import lombok.Getter;
 @Builder
 @Getter
 public class MusicRequest {
-    private String content;
+    private String emotion;
 }

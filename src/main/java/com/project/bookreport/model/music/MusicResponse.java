@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MusicResponse {
-    private String sentiment;
     private List<MusicDTO> musicList;
 }
