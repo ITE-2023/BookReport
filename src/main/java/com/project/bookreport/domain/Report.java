@@ -2,6 +2,7 @@ package com.project.bookreport.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.bookreport.domain.base.BaseEntity;
+import com.project.bookreport.domain.status.EmotionType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +27,7 @@ public class Report extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
+
+    @Enumerated(EnumType.STRING)
+    private EmotionType emotionType;
 }
