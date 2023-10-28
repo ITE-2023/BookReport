@@ -2,6 +2,7 @@ package com.project.bookreport.exception;
 
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.CustomException;
+import com.project.bookreport.exception.custom_exceptions.EmotionException;
 import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MusicException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionControllerAdvice {
 
   @ExceptionHandler({MemberException.class, BookException.class, ReportException.class,
-      MyBookException.class, MusicException.class})
+      MyBookException.class, MusicException.class, EmotionException.class})
   public ResponseEntity<Object> handleCustomException(CustomException e) {
     log.error("Error Message {} ", e.getErrorCode().getMsg());
     return ResponseEntity.status(e.getErrorCode().getStatus())
