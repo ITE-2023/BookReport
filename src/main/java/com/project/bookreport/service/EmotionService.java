@@ -8,11 +8,14 @@ import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Emotion;
 import com.project.bookreport.domain.status.EmotionType;
 import com.project.bookreport.exception.custom_exceptions.EmotionException;
+import com.project.bookreport.model.emotion.EmotionDTO;
 import com.project.bookreport.model.emotion.EmotionRequest;
 import com.project.bookreport.model.emotion.EmotionResponse;
+import com.project.bookreport.repository.BookRepository;
 import com.project.bookreport.repository.EmotionRepository;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -29,6 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EmotionService {
 
     private final EmotionRepository emotionRepository;
+    private final BookRepository bookRepository;
 
     public Emotion create() {
         Emotion emotion = new Emotion();
@@ -78,5 +82,24 @@ public class EmotionService {
         } catch (Exception e) {
             throw new EmotionException(EMOTION_NOT_FOUND);
         }
+    }
+
+    public EmotionDTO getEmotionByBook(String isbn) {
+        Optional<Book> book = bookRepository.findByIsbn(isbn);
+        if (book.isEmpty()) {
+            return null;
+        }
+        Book presentBook = book.get();
+        Emotion emotion = presentBook.getEmotion();
+        return EmotionDTO.builder()
+                .id(emotion.getId())
+                .happy(emotion.getHappy())
+                .sad(emotion.getSad())
+                .scary(emotion.getScary())
+                .anger(emotion.getAnger())
+                .surprised(emotion.getSurprised())
+                .createDate(emotion.getCreateDate())
+                .updateDate(emotion.getUpdateDate())
+                .build();
     }
 }
