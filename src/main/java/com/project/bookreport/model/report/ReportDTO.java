@@ -11,6 +11,7 @@ public class ReportDTO {
   private String title;
   private String content;
   private String username;
+  private String emotion;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
 }
