@@ -24,7 +24,11 @@ public enum ErrorCode {
   BOOK_SEARCH_FAIL(400, "해당 검색어에 대한 검색 결과가 없습니다."),
 
   MY_BOOK_NOT_UNIQUE(409, "이미 내 서재에 추가되었습니다."),
-  MY_BOOK_NOT_FOUND(404, "내 서재에 존재하지 않습니다.");
+  MY_BOOK_NOT_FOUND(404, "내 서재에 존재하지 않습니다."),
+
+  EMOTION_NOT_FOUND(404, "감정 분석 중 오류가 발생했습니다."),
+
+  MUSIC_NOT_RECOMMEND(404, "음악 추천 중 오류가 발생했습니다.");
   private final int status;
   private final String msg;
 }

@@ -6,6 +6,7 @@ import com.project.bookreport.domain.Book;
 import com.project.bookreport.domain.Member;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.domain.Report;
+import com.project.bookreport.domain.status.EmotionType;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.exception.custom_exceptions.MemberException;
 import com.project.bookreport.exception.custom_exceptions.MyBookException;
@@ -32,37 +33,41 @@ public class ReportService {
     private final MyBookRepository myBookRepository;
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
+    private final EmotionService emotionService;
 
     /**
      * 독후감 생성
      */
     @Transactional
     public ReportDTO create(MemberContext memberContext, Long myBookId,
-        ReportRequest reportRequest) {
+                            ReportRequest reportRequest) {
         MyBook myBook = myBookRepository.findById(myBookId)
-            .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+                .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
         if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
         Book book = myBook.getBook();
         Member member = memberRepository.findMemberById(memberContext.getId())
-            .orElseThrow(()->new MemberException(MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        EmotionType emotionType = emotionService.update(reportRequest.getContent(), book);
         Report report = Report.builder()
-            .title(reportRequest.getTitle())
-            .content(reportRequest.getContent())
-            .username(member.getUsername())
-            .book(book)
-            .build();
+                .title(reportRequest.getTitle())
+                .content(reportRequest.getContent())
+                .username(member.getUsername())
+                .book(book)
+                .emotionType(emotionType)
+                .build();
         Report savedReport = reportRepository.save(report);
         myBook.setReport(report);
         return ReportDTO.builder()
-            .id(savedReport.getId())
-            .title(savedReport.getTitle())
-            .content(savedReport.getContent())
-            .username(member.getUsername())
-            .createDate(savedReport.getCreateDate())
-            .updateDate(savedReport.getUpdateDate())
-            .build();
+                .id(savedReport.getId())
+                .title(savedReport.getTitle())
+                .content(savedReport.getContent())
+                .username(member.getUsername())
+                .emotionType(report.getEmotionType())
+                .createDate(savedReport.getCreateDate())
+                .updateDate(savedReport.getUpdateDate())
+                .build();
     }
 
     /**
@@ -78,15 +83,18 @@ public class ReportService {
 
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
+        EmotionType emotionType = emotionService.update(reportRequest.getContent(), report.getBook());
+        report.setEmotionType(emotionType);
         reportRepository.save(report);
         return ReportDTO.builder()
-            .id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .username(report.getUsername())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build();
+                .id(report.getId())
+                .title(report.getTitle())
+                .content(report.getContent())
+                .username(report.getUsername())
+                .emotionType(report.getEmotionType())
+                .createDate(report.getCreateDate())
+                .updateDate(report.getUpdateDate())
+                .build();
     }
 
     /**
@@ -94,7 +102,7 @@ public class ReportService {
      */
     public ReportDTO getReport(MemberContext memberContext, Long myBookId) {
         MyBook myBook = myBookRepository.findById(myBookId)
-            .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
+                .orElseThrow(() -> new MyBookException(MY_BOOK_NOT_FOUND));
         if (!myBook.getMember().getUsername().equals(memberContext.getUsername())) {
             throw new ReportException(ACCESS_DENIED);
         }
@@ -104,13 +112,14 @@ public class ReportService {
             return null;
         }
         return ReportDTO.builder()
-            .id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .username(report.getUsername())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build();
+                .id(report.getId())
+                .title(report.getTitle())
+                .content(report.getContent())
+                .username(report.getUsername())
+                .emotionType(report.getEmotionType())
+                .createDate(report.getCreateDate())
+                .updateDate(report.getUpdateDate())
+                .build();
     }
 
     /**
@@ -118,7 +127,7 @@ public class ReportService {
      */
     private Report findReportById(Long id) {
         return reportRepository.findById(id)
-            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+                .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
     }
 
     /**
@@ -126,34 +135,36 @@ public class ReportService {
      */
     public ReportPagingResponse getReportList(String isbn, Pageable pageable) {
         Book book = bookRepository.findByIsbn(isbn)
-            .orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
+                .orElseThrow(() -> new BookException(BOOK_NOT_FOUND));
 
         Page<Report> reports = reportRepository.findAllByBook(book, pageable);
         int totalPage = reports.getTotalPages();
         List<ReportDTO> reportDTOS = reports.stream().map(report ->
-            ReportDTO.builder()
-                .id(report.getId())
-                .title(report.getTitle())
-                .content(report.getContent())
-                .username(report.getUsername())
-                .createDate(report.getCreateDate())
-                .updateDate(report.getUpdateDate())
-                .build()
+                ReportDTO.builder()
+                        .id(report.getId())
+                        .title(report.getTitle())
+                        .content(report.getContent())
+                        .username(report.getUsername())
+                        .emotionType(report.getEmotionType())
+                        .createDate(report.getCreateDate())
+                        .updateDate(report.getUpdateDate())
+                        .build()
         ).toList();
         return ReportPagingResponse.builder().totalPage(totalPage).reportList(reportDTOS).build();
     }
 
     public ReportDTO getReportById(Long id) {
         Report report = reportRepository.findById(id)
-            .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
+                .orElseThrow(() -> new ReportException(REPORT_NOT_FOUND));
 
         return ReportDTO.builder()
-            .id(report.getId())
-            .title(report.getTitle())
-            .content(report.getContent())
-            .username(report.getUsername())
-            .createDate(report.getCreateDate())
-            .updateDate(report.getUpdateDate())
-            .build();
+                .id(report.getId())
+                .title(report.getTitle())
+                .content(report.getContent())
+                .username(report.getUsername())
+                .emotionType(report.getEmotionType())
+                .createDate(report.getCreateDate())
+                .updateDate(report.getUpdateDate())
+                .build();
     }
 }

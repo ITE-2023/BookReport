@@ -4,6 +4,7 @@ import static com.project.bookreport.exception.ErrorCode.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.project.bookreport.domain.Book;
+import com.project.bookreport.domain.Emotion;
 import com.project.bookreport.domain.MyBook;
 import com.project.bookreport.exception.custom_exceptions.BookException;
 import com.project.bookreport.model.book.BookDTO;
@@ -35,6 +36,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class BookService {
     private final BookRepository bookRepository;
     private final MyBookRepository myBookRepository;
+    private final EmotionService emotionService;
 
     @Value("${book.searchUrl}")
     private String BOOK_SEARCH_URL;
@@ -72,6 +74,7 @@ public class BookService {
         Optional<Book> originBook = getBook(bookRequest.getIsbn());
         Book saveBook;
         if (originBook.isEmpty()) {
+            Emotion emotion = emotionService.create();
             Book book = Book.builder()
                 .isbn(bookRequest.getIsbn())
                 .bookName(bookRequest.getBookName())
@@ -79,6 +82,7 @@ public class BookService {
                 .publisher(bookRequest.getPublisher())
                 .description(bookRequest.getDescription())
                 .imageUrl(bookRequest.getImageUrl())
+                .emotion(emotion)
                 .build();
             saveBook = bookRepository.save(book);
         } else {

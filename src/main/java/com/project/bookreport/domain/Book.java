@@ -28,4 +28,7 @@ public class Book extends BaseEntity {
     @Lob
     private String description;
     private String imageUrl;
+
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private Emotion emotion;
 }
