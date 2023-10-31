@@ -29,11 +29,14 @@ public class MusicService {
 
         ReportDTO report = reportService.getReportById(id);
         EmotionType emotionType = report.getEmotionType();
-        if (emotionType == null) {
+        if (emotionType == null || report.getContent() == null) {
             throw new MusicException(MUSIC_NOT_RECOMMEND);
         }
 
-        MusicRequest request = MusicRequest.builder().emotion(emotionType.getMsg()).build();
+        MusicRequest request = MusicRequest.builder()
+                .emotion(emotionType.getMsg())
+                .content(report.getContent())
+                .build();
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent;
         try {
