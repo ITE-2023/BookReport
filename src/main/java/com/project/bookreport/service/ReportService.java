@@ -83,6 +83,7 @@ public class ReportService {
 
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
+        report.setEmotionType(EmotionType.valueOf(reportRequest.getEmotion()));
         EmotionType emotionType = emotionService.update(reportRequest.getContent(), report.getBook());
         report.setEmotionType(emotionType);
         reportRepository.save(report);
