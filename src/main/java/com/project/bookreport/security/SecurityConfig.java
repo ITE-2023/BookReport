@@ -42,7 +42,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**" , "/book/detail/**", "/reports/**")
+            .requestMatchers("/member/join", "/member/login", "/member/reissue", "/book/search/**" , "/book/detail/**", "/reports/**", "/emotion/**")
             .permitAll()
             .requestMatchers("/book/create", "/book/delete/**", "/book/update/**").hasRole("ADMIN")
             .anyRequest().authenticated())

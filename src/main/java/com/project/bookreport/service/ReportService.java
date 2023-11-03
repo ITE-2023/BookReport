@@ -83,9 +83,14 @@ public class ReportService {
 
         report.setTitle(reportRequest.getTitle());
         report.setContent(reportRequest.getContent());
-        EmotionType emotionType = emotionService.update(reportRequest.getContent(), report.getBook());
+
+        EmotionType emotionType;
+        if (reportRequest.getEmotion() == null) {
+            emotionType = emotionService.update(reportRequest.getContent(), report.getBook());
+        } else {
+            emotionType = EmotionType.valueOf(reportRequest.getEmotion());
+        }
         report.setEmotionType(emotionType);
-        reportRepository.save(report);
         return ReportDTO.builder()
                 .id(report.getId())
                 .title(report.getTitle())
