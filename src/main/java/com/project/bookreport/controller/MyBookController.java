@@ -37,8 +37,8 @@ public class MyBookController {
   /**
    * 내 서재에 담기
    */
-  @PostMapping("/myBook/save")
-  public ResponseEntity<MyBookDTO> saveMyBook(@AuthenticationPrincipal MemberContext memberContext,
+  @PostMapping("/myBook/create")
+  public ResponseEntity<MyBookDTO> createMyBook(@AuthenticationPrincipal MemberContext memberContext,
       @Valid @RequestBody MyBookVO myBookVO) {
     BookDTO bookDTO = bookService.create(myBookVO.getBookRequest());
     MyBookDTO myBookDTO = myBookService.saveMyBook(memberContext, bookDTO,

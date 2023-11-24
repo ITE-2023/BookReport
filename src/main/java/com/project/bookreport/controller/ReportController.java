@@ -27,9 +27,9 @@ public class ReportController {
     /**
      * 독후감 생성
      */
-    @PostMapping("/report/create/{id}")
+    @PostMapping("/report/create/{myBookId}")
     public ResponseEntity<ReportDTO> create(@AuthenticationPrincipal MemberContext memberContext,
-        @PathVariable("id") Long myBookId, @Valid @RequestBody ReportRequest reportRequest) {
+        @PathVariable("myBookId") Long myBookId, @Valid @RequestBody ReportRequest reportRequest) {
         ReportDTO reportDTO = reportService.create(memberContext, myBookId, reportRequest);
         return ResponseEntity.ok(reportDTO);
     }
